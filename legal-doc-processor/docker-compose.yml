@@ -37,7 +37,7 @@ services:
       - legal-net
 
   temporal:
-    image: temporalio/auto-setup:1.25.2
+    image: temporalio/auto-setup
     container_name: legal-temporal
     depends_on:
       - postgresql

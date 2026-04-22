@@ -1,6 +1,7 @@
 package com.example.legaldoc.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.cluster.HealthResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
@@ -51,6 +52,8 @@ public class ElasticsearchService {
                                 .properties("locationDescription", p -> p.text(t -> t))
                                 .properties("extractedText", p -> p.text(t -> t))
                                 .properties("status", p -> p.keyword(k -> k))
+                                .properties("manifestS3Key", p -> p.keyword(k -> k))
+                                .properties("tmpPrefix", p -> p.keyword(k -> k))
                                 .properties("topKeywords", p -> p.nested(n -> n
                                         .properties("keyword", pp -> pp.keyword(k -> k))
                                         .properties("score", pp -> pp.double_(d -> d))
@@ -65,23 +68,32 @@ public class ElasticsearchService {
         }
     }
 
+    /**
+     * Index a document and force a refresh so the write is visible to subsequent
+     * searches immediately. Without this, integration tests that search right
+     * after indexing hit the 1-second default refresh interval and see zero hits.
+     */
     public String indexDocument(DocumentMetadata doc) throws IOException {
         IndexResponse response = esClient.index(i -> i
                 .index(indexName)
                 .id(doc.getDocumentId())
+                .refresh(Refresh.True)
                 .document(doc));
         log.info("Indexed document {} into ES: result={}", doc.getDocumentId(), response.result());
         return response.id();
     }
 
     public List<DocumentMetadata> searchByKeyword(String keyword) throws IOException {
+        // topKeywords.keyword is stored lowercased by TfIdfService, so lowercase
+        // the query term here for exact-term matching to work.
+        String term = keyword == null ? "" : keyword.toLowerCase();
         SearchResponse<DocumentMetadata> response = esClient.search(s -> s
                         .index(indexName)
                         .query(Query.of(q -> q.nested(n -> n
                                 .path("topKeywords")
                                 .query(nq -> nq.term(t -> t
                                         .field("topKeywords.keyword")
-                                        .value(keyword.toLowerCase())))))),
+                                        .value(term)))))),
                 DocumentMetadata.class);
 
         return response.hits().hits().stream()

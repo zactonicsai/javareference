@@ -62,6 +62,30 @@ public class S3Service {
         return s3Client.getObject(getRequest);
     }
 
+    /**
+     * Upload arbitrary bytes (used by the page-worker to write per-page text,
+     * per-page images, and the manifest under the document's tmp prefix).
+     */
+    public String uploadBytes(String key, byte[] data, String contentType) {
+        log.debug("Uploading {} bytes to s3://{}/{} (contentType={})",
+                data.length, bucketName, key, contentType);
+        PutObjectRequest putRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .contentType(contentType == null ? "application/octet-stream" : contentType)
+                .contentLength((long) data.length)
+                .build();
+        s3Client.putObject(putRequest, RequestBody.fromBytes(data));
+        return key;
+    }
+
+    public void deleteFile(String key) {
+        s3Client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build());
+    }
+
     public byte[] downloadFileAsBytes(String key) throws IOException {
         try (ResponseInputStream<GetObjectResponse> response = s3Client.getObject(
                 GetObjectRequest.builder().bucket(bucketName).key(key).build())) {
