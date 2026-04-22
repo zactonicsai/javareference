@@ -1,146 +1,1351 @@
-<!-- STEP: VALIDATION + LOMBOK -->
-<section id="validation-lombok" class="bg-white dark:bg-slate-900 rounded-2xl shadow-soft p-6 border border-slate-200 dark:border-slate-800">
-  
-  <div class="flex items-start justify-between gap-4">
-    <div>
-      <h2 class="text-2xl font-bold">7. Jakarta Validation & Lombok Best Practices</h2>
-      <p class="mt-3 leading-7">
-        In real applications, you should validate incoming data and reduce boilerplate code.
-        This is where <strong>Jakarta Validation</strong> and <strong>Lombok</strong> come in.
-      </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java 21 Builder Pattern —  Developer Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ibm-blue-60: #0f62fe;
+    --ibm-blue-70: #0043ce;
+    --ibm-blue-10: #edf5ff;
+    --ibm-blue-20: #d0e2ff;
+    --ibm-blue-40: #78a9ff;
+    --ibm-gray-10: #f4f4f4;
+    --ibm-gray-20: #e0e0e0;
+    --ibm-gray-40: #a8a8a8;
+    --ibm-gray-60: #6f6f6f;
+    --ibm-gray-70: #525252;
+    --ibm-gray-80: #393939;
+    --ibm-gray-90: #262626;
+    --ibm-gray-100: #161616;
+    --ibm-white: #ffffff;
+    --ibm-red-60: #da1e28;
+    --ibm-green-50: #24a148;
+    --ibm-teal-40: #3ddbd9;
+    --ibm-purple-60: #8a3ffc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--ibm-gray-10);
+    color: var(--ibm-gray-100);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--ibm-gray-100);
+    color: var(--ibm-white);
+    padding: 0;
+    border-bottom: 3px solid var(--ibm-blue-60);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ibm-blue-40);
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+  }
+  .header-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--ibm-gray-70);
+  }
+  .header-title {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--ibm-gray-40);
+    letter-spacing: 0.5px;
+  }
+  .header-badge {
+    margin-left: auto;
+    background: var(--ibm-blue-60);
+    color: white;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    letter-spacing: 1px;
+  }
+
+  /* BREADCRUMB */
+  .breadcrumb {
+    background: var(--ibm-white);
+    border-bottom: 1px solid var(--ibm-gray-20);
+    padding: 10px 32px;
+    font-size: 12px;
+    color: var(--ibm-gray-60);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .breadcrumb span { color: var(--ibm-blue-60); }
+
+  /* MAIN LAYOUT */
+  .main-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 32px;
+  }
+
+  /* SIDEBAR NAV */
+  .sidebar {
+    position: sticky;
+    top: 24px;
+    height: fit-content;
+  }
+  .sidebar-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ibm-gray-60);
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--ibm-gray-20);
+    margin-bottom: 8px;
+  }
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--ibm-gray-70);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .sidebar-link:hover {
+    background: var(--ibm-blue-10);
+    color: var(--ibm-blue-60);
+    border-left-color: var(--ibm-blue-60);
+  }
+  .sidebar-link.active {
+    background: var(--ibm-blue-10);
+    color: var(--ibm-blue-60);
+    border-left-color: var(--ibm-blue-60);
+    font-weight: 500;
+  }
+  .sidebar-dot {
+    width: 6px; height: 6px;
+    background: var(--ibm-blue-60);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* CONTENT AREA */
+  .content { min-width: 0; }
+
+  /* SECTION CARDS */
+  .card {
+    background: var(--ibm-white);
+    border: 1px solid var(--ibm-gray-20);
+    margin-bottom: 2px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--ibm-blue-40); }
+  .card-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--ibm-gray-20);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .card-header-left { flex: 1; }
+  .card-tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    margin-bottom: 6px;
+  }
+  .tag-core { background: var(--ibm-blue-10); color: var(--ibm-blue-60); }
+  .tag-validation { background: #fff5f5; color: var(--ibm-red-60); }
+  .tag-lombok { background: #f3e8ff; color: var(--ibm-purple-60); }
+  .tag-simulation { background: #defbe6; color: var(--ibm-green-50); }
+  .tag-quiz { background: var(--ibm-gray-10); color: var(--ibm-gray-70); }
+  .tag-dto { background: #e5f6ff; color: #0072c3; }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ibm-gray-100);
+    margin-bottom: 4px;
+  }
+  .card-subtitle {
+    font-size: 13px;
+    color: var(--ibm-gray-60);
+    font-weight: 300;
+  }
+  .card-body { padding: 20px 24px; }
+
+  /* CODE BLOCKS */
+  pre.code-block {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    background: var(--ibm-gray-100);
+    color: #be95ff;
+    padding: 20px;
+    overflow-x: auto;
+    line-height: 1.7;
+    border-left: 4px solid var(--ibm-blue-60);
+    margin: 12px 0;
+  }
+  .code-keyword { color: var(--ibm-teal-40); }
+  .code-type { color: #ff7eb6; }
+  .code-string { color: #42be65; }
+  .code-comment { color: #6f6f6f; font-style: italic; }
+  .code-annotation { color: #ff832b; }
+  .code-method { color: #78a9ff; }
+
+  /* DESCRIPTION TEXT */
+  .desc-text {
+    font-size: 14px;
+    color: var(--ibm-gray-70);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  .desc-text b { color: var(--ibm-gray-100); font-weight: 500; }
+
+  /* BUTTONS */
+  .btn-primary {
+    background: var(--ibm-blue-60);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:hover { background: var(--ibm-blue-70); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ibm-blue-60);
+    border: 1px solid var(--ibm-blue-60);
+    padding: 8px 16px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-ghost:hover { background: var(--ibm-blue-10); }
+
+  .btn-green {
+    background: var(--ibm-green-50);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* INLINE DETAILS */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .detail-card {
+    background: var(--ibm-gray-10);
+    border: 1px solid var(--ibm-gray-20);
+    padding: 14px 16px;
+  }
+  .detail-card-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ibm-gray-60);
+    margin-bottom: 6px;
+  }
+  .detail-card-text {
+    font-size: 13px;
+    color: var(--ibm-gray-80);
+    line-height: 1.5;
+  }
+
+  /* KEY THINGS REMEMBER */
+  .remember-list {
+    list-style: none;
+    margin-top: 12px;
+  }
+  .remember-list li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--ibm-gray-20);
+    font-size: 13px;
+    color: var(--ibm-gray-80);
+  }
+  .remember-list li:last-child { border-bottom: none; }
+  .remember-icon {
+    width: 18px; height: 18px;
+    background: var(--ibm-blue-60);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* SIMULATION */
+  .sim-input {
+    border: 1px solid var(--ibm-gray-40);
+    padding: 10px 12px;
+    width: 100%;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ibm-gray-100);
+    background: var(--ibm-white);
+    margin-bottom: 8px;
+    transition: border-color 0.15s;
+  }
+  .sim-input:focus {
+    outline: none;
+    border-color: var(--ibm-blue-60);
+    box-shadow: 0 0 0 2px var(--ibm-blue-20);
+  }
+  .sim-output {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: var(--ibm-gray-100);
+    color: #42be65;
+    padding: 16px;
+    min-height: 80px;
+    margin-top: 12px;
+    line-height: 1.7;
+  }
+  .sim-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ibm-gray-60);
+    margin-bottom: 4px;
+  }
+
+  /* QUIZ */
+  .quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--ibm-gray-20);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 13px;
+  }
+  .quiz-option:hover { border-color: var(--ibm-blue-60); background: var(--ibm-blue-10); }
+  .quiz-option input { accent-color: var(--ibm-blue-60); }
+  .quiz-result {
+    margin-top: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    display: none;
+  }
+  .quiz-correct { background: #defbe6; color: var(--ibm-green-50); border-left: 4px solid var(--ibm-green-50); }
+  .quiz-wrong { background: #fff5f5; color: var(--ibm-red-60); border-left: 4px solid var(--ibm-red-60); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(22,22,22,0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--ibm-white);
+    width: 100%;
+    max-width: 740px;
+    max-height: 88vh;
+    overflow-y: auto;
+    border-top: 4px solid var(--ibm-blue-60);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .modal-header {
+    background: var(--ibm-gray-100);
+    color: var(--ibm-white);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header-title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--ibm-gray-40);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+  }
+  .modal-close:hover { color: var(--ibm-white); }
+  .modal-body { padding: 28px; }
+  .modal-section {
+    margin-bottom: 24px;
+  }
+  .modal-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ibm-blue-60);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--ibm-blue-20);
+  }
+  .modal-text {
+    font-size: 13px;
+    color: var(--ibm-gray-70);
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  .modal-text b { color: var(--ibm-gray-100); font-weight: 500; }
+
+  .key-reminder {
+    background: var(--ibm-blue-10);
+    border-left: 4px solid var(--ibm-blue-60);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--ibm-gray-80);
+    margin-top: 12px;
+  }
+  .key-reminder b { color: var(--ibm-blue-70); }
+
+  .warning-box {
+    background: #fff5f5;
+    border-left: 4px solid var(--ibm-red-60);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--ibm-gray-80);
+    margin-top: 8px;
+  }
+
+  .tip-box {
+    background: #defbe6;
+    border-left: 4px solid var(--ibm-green-50);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--ibm-gray-80);
+    margin-top: 8px;
+  }
+
+  /* DIVIDERS */
+  .section-divider {
+    height: 24px;
+  }
+
+  /* TABS in modal */
+  .modal-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--ibm-gray-20);
+    margin-bottom: 20px;
+    gap: 0;
+  }
+  .modal-tab {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    color: var(--ibm-gray-60);
+    margin-bottom: -1px;
+    transition: all 0.15s;
+  }
+  .modal-tab.active {
+    color: var(--ibm-blue-60);
+    border-bottom-color: var(--ibm-blue-60);
+  }
+  .modal-tab-panel { display: none; }
+  .modal-tab-panel.active { display: block; }
+
+  /* PAGE INTRO HERO */
+  .hero {
+    background: var(--ibm-gray-100);
+    color: var(--ibm-white);
+    padding: 32px;
+    margin-bottom: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 240px; height: 240px;
+    border: 32px solid rgba(15,98,254,0.15);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: 40px; top: 40px;
+    width: 120px; height: 120px;
+    border: 16px solid rgba(15,98,254,0.08);
+    border-radius: 50%;
+  }
+  .hero-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--ibm-blue-40);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .hero-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .hero-title span { color: var(--ibm-blue-40); }
+  .hero-desc {
+    font-size: 14px;
+    color: var(--ibm-gray-40);
+    font-weight: 300;
+    max-width: 520px;
+    line-height: 1.6;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 20px;
+  }
+  .hero-stat-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ibm-blue-40);
+  }
+  .hero-stat-label {
+    font-size: 11px;
+    color: var(--ibm-gray-60);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .main-wrapper { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .detail-grid { grid-template-columns: 1fr; }
+    .hero-stats { flex-wrap: wrap; gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <span class="header-logo">Demo</span>
+    <div class="header-divider"></div>
+    <span class="header-title">Developer Learning / Java</span>
+    <span class="header-badge">JAVA 21</span>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="main-wrapper" style="padding-bottom:0; display:block; max-width:1200px;">
+  <div class="hero">
+    <div class="hero-eyebrow">Design Patterns · Java 21</div>
+    <h1 class="hero-title">Builder Pattern<br><span>In-Depth Tutorial</span></h1>
+    <p class="hero-desc">Master the Builder pattern, Jakarta validation, Lombok integration, and document ingestion pipelines. Production-ready Java 21 patterns used across IBM enterprise services.</p>
+    <div class="hero-stats">
+      <div><div class="hero-stat-num">5</div><div class="hero-stat-label">Topics</div></div>
+      <div><div class="hero-stat-num">12+</div><div class="hero-stat-label">Code Examples</div></div>
+      <div><div class="hero-stat-num">~30</div><div class="hero-stat-label">Min Read</div></div>
     </div>
-    <button onclick="openModal('validationModal')" class="px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-500">
-      Deep Dive
-    </button>
   </div>
+</div>
 
-  <!-- JAKARTA VALIDATION -->
-  <div class="mt-6">
-    <h3 class="text-xl font-bold mb-3">Jakarta Validation (Request Validation)</h3>
+<!-- MAIN -->
+<div class="main-wrapper">
 
-<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto">
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">On This Page</div>
+    <a class="sidebar-link active" onclick="scrollTo('sec-overview')"><div class="sidebar-dot"></div> Overview</a>
+    <a class="sidebar-link" onclick="scrollTo('sec-builder')"><div class="sidebar-dot"></div> Builder Interface</a>
+    <a class="sidebar-link" onclick="scrollTo('sec-dto')"><div class="sidebar-dot"></div> DTO / Record</a>
+    <a class="sidebar-link" onclick="scrollTo('sec-validation')"><div class="sidebar-dot"></div> Jakarta Validation</a>
+    <a class="sidebar-link" onclick="scrollTo('sec-lombok')"><div class="sidebar-dot"></div> Lombok</a>
+    <a class="sidebar-link" onclick="scrollTo('sec-simulation')"><div class="sidebar-dot"></div> Live Simulation</a>
+    <a class="sidebar-link" onclick="scrollTo('sec-quiz')"><div class="sidebar-dot"></div> Knowledge Quiz</a>
+  </aside>
 
-public record DocumentIngestionRequest(
+  <!-- CONTENT -->
+  <div class="content">
 
-    @NotBlank(message = "File name is required")
-    String fileName,
+    <!-- OVERVIEW -->
+    <div id="sec-overview" class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-tag tag-core">Foundation</div>
+          <div class="card-title">Overview — Why Builder?</div>
+          <div class="card-subtitle">Understanding the problem Builder solves in large-scale Java systems</div>
+        </div>
+        <button class="btn-ghost" onclick="openModal('modal-overview')">Advanced Examples →</button>
+      </div>
+      <div class="card-body">
+        <p class="desc-text">The <b>Builder pattern</b> is a creational design pattern that separates the construction of a complex object from its representation. It is especially valuable when constructors would otherwise require <b>many parameters</b>, some optional, creating ambiguous code that is hard to read and maintain.</p>
+        <p class="desc-text">In Java 21 enterprise systems — such as IBM's document ingestion pipelines — objects like <b>DocumentRequest</b>, <b>PolicyRecord</b>, or <b>TransactionDTO</b> can have 10–20+ fields. Passing them all via constructor leads to "telescoping constructor" anti-patterns.</p>
+        <div class="detail-grid">
+          <div class="detail-card">
+            <div class="detail-card-label">Problem Without Builder</div>
+            <div class="detail-card-text">new Document("id1", "file.pdf", null, "RECEIVED", true, null, null, false) — unreadable and error-prone.</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-label">Solution With Builder</div>
+            <div class="detail-card-text">Document.builder().id("id1").name("file.pdf").status("RECEIVED").valid(true).build() — fluent, self-documenting.</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-label">Immutability Guarantee</div>
+            <div class="detail-card-text">Builder enforces field collection before construction, enabling fully immutable objects once built (records, @Value).</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-label">Validation Gate</div>
+            <div class="detail-card-text">The build() method is the single point of validation — reject invalid state before the object ever exists.</div>
+          </div>
+        </div>
+        <ul class="remember-list" style="margin-top:16px;">
+          <li><div class="remember-icon">!</div> Builder is <b>not</b> the same as the Factory pattern — Builder constructs step-by-step; Factory creates in one call.</li>
+          <li><div class="remember-icon">!</div> Always make built objects <b>immutable</b> — use <code style="font-family:IBM Plex Mono,monospace;font-size:12px">record</code> or <code style="font-family:IBM Plex Mono,monospace;font-size:12px">@Value</code> (Lombok).</li>
+          <li><div class="remember-icon">!</div> Call <code style="font-family:IBM Plex Mono,monospace;font-size:12px">build()</code> exactly <b>once</b> — reusing a builder after build() can cause shared mutable state bugs.</li>
+        </ul>
+      </div>
+    </div>
 
-    @Size(min = 5, max = 5000, message = "Content must be between 5 and 5000 chars")
-    String content,
+    <div class="section-divider"></div>
 
-    String geoTag
+    <!-- BUILDER INTERFACE -->
+    <div id="sec-builder" class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-tag tag-core">Core Pattern</div>
+          <div class="card-title">Builder Interface</div>
+          <div class="card-subtitle">Defining the fluent construction contract with Java interfaces</div>
+        </div>
+        <button class="btn-ghost" onclick="openModal('modal-builder')">Advanced Examples →</button>
+      </div>
+      <div class="card-body">
+        <p class="desc-text">The <b>DocumentBuilder interface</b> defines the contract for constructing a Document. Each method returns <b>DocumentBuilder</b> itself, enabling method chaining. The final <code style="font-family:IBM Plex Mono,monospace;font-size:12px">build()</code> call terminates the chain and returns the completed object.</p>
 
-) { }
-</pre>
-
-    <p class="mt-3 text-sm">
-      This ensures invalid requests are rejected before reaching business logic.
-    </p>
-  </div>
-
-  <!-- CONTROLLER VALIDATION -->
-  <div class="mt-6">
-    <h3 class="text-xl font-bold mb-3">Controller with Validation</h3>
-
-<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto">
-@PostMapping("/ingest")
-public DocumentIngestionResponse ingest(
-    @Valid @RequestBody DocumentIngestionRequest request
-) {
-    return documentIngestionService.ingest(request);
+        <pre class="code-block"><span class="code-comment">// Builder interface — the construction contract</span>
+<span class="code-keyword">public interface</span> <span class="code-type">DocumentBuilder</span> {
+    <span class="code-type">DocumentBuilder</span> <span class="code-method">id</span>(<span class="code-type">String</span> id);
+    <span class="code-type">DocumentBuilder</span> <span class="code-method">name</span>(<span class="code-type">String</span> name);
+    <span class="code-type">DocumentBuilder</span> <span class="code-method">type</span>(<span class="code-type">String</span> type);
+    <span class="code-type">DocumentBuilder</span> <span class="code-method">status</span>(<span class="code-type">String</span> status);
+    <span class="code-type">DocumentBuilder</span> <span class="code-method">valid</span>(<span class="code-keyword">boolean</span> valid);
+    <span class="code-type">Document</span>        <span class="code-method">build</span>();  <span class="code-comment">// terminates the chain</span>
 }
-</pre>
 
-    <p class="mt-3 text-sm">
-      <strong>@Valid</strong> triggers validation automatically.
-    </p>
+<span class="code-comment">// Default implementation (inner or package-private)</span>
+<span class="code-keyword">class</span> <span class="code-type">DefaultBuilder</span> <span class="code-keyword">implements</span> <span class="code-type">DocumentBuilder</span> {
+    <span class="code-keyword">private</span> <span class="code-type">String</span> id, name, type, status;
+    <span class="code-keyword">private boolean</span> valid;
+
+    <span class="code-keyword">public</span> <span class="code-type">DocumentBuilder</span> <span class="code-method">id</span>(<span class="code-type">String</span> id)     { <span class="code-keyword">this</span>.id = id; <span class="code-keyword">return this</span>; }
+    <span class="code-keyword">public</span> <span class="code-type">DocumentBuilder</span> <span class="code-method">name</span>(<span class="code-type">String</span> n)   { <span class="code-keyword">this</span>.name = n; <span class="code-keyword">return this</span>; }
+    <span class="code-keyword">public</span> <span class="code-type">DocumentBuilder</span> <span class="code-method">type</span>(<span class="code-type">String</span> t)   { <span class="code-keyword">this</span>.type = t; <span class="code-keyword">return this</span>; }
+    <span class="code-keyword">public</span> <span class="code-type">DocumentBuilder</span> <span class="code-method">status</span>(<span class="code-type">String</span> s) { <span class="code-keyword">this</span>.status = s; <span class="code-keyword">return this</span>; }
+    <span class="code-keyword">public</span> <span class="code-type">DocumentBuilder</span> <span class="code-method">valid</span>(<span class="code-keyword">boolean</span> v) { <span class="code-keyword">this</span>.valid = v; <span class="code-keyword">return this</span>; }
+
+    <span class="code-keyword">public</span> <span class="code-type">Document</span> <span class="code-method">build</span>() {
+        <span class="code-comment">// Validate before constructing</span>
+        <span class="code-keyword">if</span> (name == <span class="code-keyword">null</span> || name.isBlank())
+            <span class="code-keyword">throw new</span> <span class="code-type">IllegalStateException</span>(<span class="code-string">"name required"</span>);
+        <span class="code-keyword">return new</span> <span class="code-type">Document</span>(id, name, type, status, valid);
+    }
+}</pre>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- DTO / RECORD -->
+    <div id="sec-dto" class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-tag tag-dto">Java 16+</div>
+          <div class="card-title">DTO with Java Records</div>
+          <div class="card-subtitle">Immutable data carriers using Java's record keyword</div>
+        </div>
+        <button class="btn-ghost" onclick="openModal('modal-dto')">Advanced Examples →</button>
+      </div>
+      <div class="card-body">
+        <p class="desc-text"><b>Java Records</b> (stable since Java 16) provide compact, immutable data classes with zero boilerplate. They automatically generate <b>constructor, getters, equals(), hashCode(), and toString()</b>. Pairing records with the Builder pattern gives you the best of both: fluent construction + guaranteed immutability.</p>
+
+        <pre class="code-block"><span class="code-comment">// Java 21 record — compact immutable DTO</span>
+<span class="code-keyword">public record</span> <span class="code-type">Document</span>(
+    <span class="code-type">String</span>  id,
+    <span class="code-type">String</span>  name,
+    <span class="code-type">String</span>  type,
+    <span class="code-type">String</span>  status,
+    <span class="code-keyword">boolean</span> valid
+) {
+    <span class="code-comment">// Compact constructor for record-level validation</span>
+    <span class="code-keyword">public</span> <span class="code-type">Document</span> {
+        <span class="code-type">Objects</span>.<span class="code-method">requireNonNull</span>(name, <span class="code-string">"name must not be null"</span>);
+        <span class="code-keyword">if</span> (name.isBlank()) <span class="code-keyword">throw new</span> <span class="code-type">IllegalArgumentException</span>(<span class="code-string">"name blank"</span>);
+    }
+
+    <span class="code-comment">// Static factory to enter builder chain</span>
+    <span class="code-keyword">public static</span> <span class="code-type">DocumentBuilder</span> <span class="code-method">builder</span>() {
+        <span class="code-keyword">return new</span> <span class="code-type">DefaultBuilder</span>();
+    }
+}</pre>
+
+        <ul class="remember-list">
+          <li><div class="remember-icon">!</div> Records are <b>implicitly final</b> — they cannot be subclassed.</li>
+          <li><div class="remember-icon">!</div> Record fields are <b>implicitly private and final</b> — set once at construction only.</li>
+          <li><div class="remember-icon">!</div> Use <b>compact constructors</b> (no parameter list) to add validation without repeating field assignments.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- VALIDATION -->
+    <div id="sec-validation" class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-tag tag-validation">Jakarta EE</div>
+          <div class="card-title">Jakarta Validation (Bean Validation 3.0)</div>
+          <div class="card-subtitle">Declarative constraint annotations for input validation</div>
+        </div>
+        <button class="btn-ghost" onclick="openModal('modal-validation')">Advanced Examples →</button>
+      </div>
+      <div class="card-body">
+        <p class="desc-text"><b>Jakarta Bean Validation 3.0</b> (formerly Hibernate Validator) provides annotation-driven constraints. When combined with Spring Boot's <code style="font-family:IBM Plex Mono,monospace;font-size:12px">@Valid</code>, violations automatically return structured <b>400 Bad Request</b> responses with field-level error messages — no manual if-checks needed.</p>
+
+        <pre class="code-block"><span class="code-comment">// Request DTO with validation constraints</span>
+<span class="code-keyword">public record</span> <span class="code-type">DocumentRequest</span>(
+
+    <span class="code-annotation">@NotBlank</span>(message = <span class="code-string">"Document name is required"</span>)
+    <span class="code-annotation">@Size</span>(max = 255, message = <span class="code-string">"Name must not exceed 255 characters"</span>)
+    <span class="code-type">String</span> name,
+
+    <span class="code-annotation">@NotBlank</span>
+    <span class="code-annotation">@Size</span>(min = 5, max = 5000, message = <span class="code-string">"Content must be 5–5000 characters"</span>)
+    <span class="code-type">String</span> content,
+
+    <span class="code-annotation">@NotNull</span>
+    <span class="code-annotation">@Pattern</span>(regexp = <span class="code-string">"PDF|DOCX|TXT"</span>, message = <span class="code-string">"Unsupported type"</span>)
+    <span class="code-type">String</span> type,
+
+    <span class="code-annotation">@Email</span>
+    <span class="code-type">String</span> submittedBy
+
+) {}
+
+<span class="code-comment">// Spring controller — validation triggered by @Valid</span>
+<span class="code-annotation">@PostMapping</span>(<span class="code-string">"/documents"</span>)
+<span class="code-keyword">public</span> <span class="code-type">ResponseEntity</span>&lt;<span class="code-type">Document</span>&gt; <span class="code-method">create</span>(
+    <span class="code-annotation">@Valid</span> <span class="code-annotation">@RequestBody</span> <span class="code-type">DocumentRequest</span> req
+) {
+    <span class="code-keyword">return</span> <span class="code-type">ResponseEntity</span>.<span class="code-method">ok</span>(service.<span class="code-method">create</span>(req));
+}</pre>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- LOMBOK -->
+    <div id="sec-lombok" class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-tag tag-lombok">Lombok</div>
+          <div class="card-title">Lombok @Builder & @Value</div>
+          <div class="card-subtitle">Annotation-driven builder generation — zero boilerplate</div>
+        </div>
+        <button class="btn-ghost" onclick="openModal('modal-lombok')">Advanced Examples →</button>
+      </div>
+      <div class="card-body">
+        <p class="desc-text"><b>Lombok's @Builder</b> annotation generates a complete inner builder class at compile time. Combined with <b>@Value</b> (immutable class) or <b>@Data</b> (mutable), it eliminates hundreds of lines of repetitive code in large domain models. Every IBM Java microservice at scale uses this pattern.</p>
+
+        <pre class="code-block"><span class="code-comment">// @Value = immutable; @Builder = auto-generated builder</span>
+<span class="code-annotation">@Value</span>
+<span class="code-annotation">@Builder</span>(toBuilder = <span class="code-keyword">true</span>)
+<span class="code-keyword">public class</span> <span class="code-type">DocumentDTO</span> {
+    <span class="code-type">String</span>  id;
+    <span class="code-type">String</span>  name;
+    <span class="code-type">String</span>  type;
+    <span class="code-type">String</span>  status;
+    <span class="code-keyword">boolean</span> valid;
+    <span class="code-type">Instant</span> createdAt;
+
+    <span class="code-comment">// Custom default via @Builder.Default</span>
+    <span class="code-annotation">@Builder.Default</span>
+    <span class="code-type">String</span> status2 = <span class="code-string">"PENDING"</span>;
+}
+
+<span class="code-comment">// Usage — Lombok generates all this for free:</span>
+<span class="code-type">DocumentDTO</span> doc = <span class="code-type">DocumentDTO</span>.<span class="code-method">builder</span>()
+    .<span class="code-method">id</span>(<span class="code-type">UUID</span>.<span class="code-method">randomUUID</span>().toString())
+    .<span class="code-method">name</span>(<span class="code-string">"Q3 Report.pdf"</span>)
+    .<span class="code-method">type</span>(<span class="code-string">"PDF"</span>)
+    .<span class="code-method">valid</span>(<span class="code-keyword">true</span>)
+    .<span class="code-method">createdAt</span>(<span class="code-type">Instant</span>.<span class="code-method">now</span>())
+    .<span class="code-method">build</span>();
+
+<span class="code-comment">// toBuilder = true allows non-destructive copies:</span>
+<span class="code-type">DocumentDTO</span> updated = doc.<span class="code-method">toBuilder</span>().<span class="code-method">status</span>(<span class="code-string">"PROCESSED"</span>).<span class="code-method">build</span>();</pre>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- SIMULATION -->
+    <div id="sec-simulation" class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-tag tag-simulation">Interactive</div>
+          <div class="card-title">Live Document Ingestion Simulation</div>
+          <div class="card-subtitle">Simulate the full builder + validation pipeline</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="desc-text">Enter document details to simulate the full ingestion flow: Builder construction → Jakarta validation → ID assignment → status routing.</p>
+
+        <div class="detail-grid" style="margin-bottom:16px;">
+          <div>
+            <div class="sim-label">Document Name</div>
+            <input id="sim-name" class="sim-input" placeholder="e.g. Q3-Financial-Report.pdf">
+          </div>
+          <div>
+            <div class="sim-label">Document Type</div>
+            <select id="sim-type" class="sim-input" style="cursor:pointer;">
+              <option value="PDF">PDF</option>
+              <option value="DOCX">DOCX</option>
+              <option value="TXT">TXT</option>
+            </select>
+          </div>
+        </div>
+        <div class="sim-label">Content Preview (5–5000 chars)</div>
+        <textarea id="sim-content" class="sim-input" rows="3" placeholder="Enter document content for validation..."></textarea>
+
+        <button class="btn-primary" onclick="simulate()">▶ Run Simulation</button>
+
+        <div class="sim-label" style="margin-top:16px;">Builder Output</div>
+        <pre class="sim-output" id="output">// Output will appear here after running...</pre>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- QUIZ -->
+    <div id="sec-quiz" class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-tag tag-quiz">Assessment</div>
+          <div class="card-title">Knowledge Check</div>
+          <div class="card-subtitle">Test your understanding of the Builder pattern</div>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <p style="font-size:13px; font-weight:600; color:var(--ibm-gray-100); margin-bottom:12px;">Q1 — What is the primary purpose of the Builder pattern?</p>
+        <label class="quiz-option"><input type="radio" name="q1" value="a"> Enforce security policies on object fields</label>
+        <label class="quiz-option"><input type="radio" name="q1" value="b"> Provide a fluent, readable way to construct complex objects step-by-step</label>
+        <label class="quiz-option"><input type="radio" name="q1" value="c"> Replace dependency injection in Spring applications</label>
+
+        <p style="font-size:13px; font-weight:600; color:var(--ibm-gray-100); margin:16px 0 12px;">Q2 — What does Lombok's <code style="font-family:IBM Plex Mono;font-size:12px">toBuilder = true</code> enable?</p>
+        <label class="quiz-option"><input type="radio" name="q2" value="a"> Creating a new builder from an existing object instance for non-destructive copies</label>
+        <label class="quiz-option"><input type="radio" name="q2" value="b"> Automatically converting the object to JSON</label>
+        <label class="quiz-option"><input type="radio" name="q2" value="c"> Adding thread-safety to the builder class</label>
+
+        <p style="font-size:13px; font-weight:600; color:var(--ibm-gray-100); margin:16px 0 12px;">Q3 — In Jakarta Validation, which annotation prevents a string field from being null OR blank?</p>
+        <label class="quiz-option"><input type="radio" name="q3" value="a">@NotNull</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="b">@NotEmpty</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="c">@NotBlank</label>
+
+        <button class="btn-green" onclick="checkQuiz()" style="margin-top:16px;">Check Answers</button>
+        <div id="quizOut" class="quiz-result"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main-wrapper -->
+
+
+<!-- ============================================================ MODALS ============================================================ -->
+
+<!-- OVERVIEW MODAL -->
+<div id="modal-overview" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-header-title">Builder Pattern — Advanced Deep Dive</span>
+      <button class="modal-close" onclick="closeModal('modal-overview')">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-tabs">
+        <div class="modal-tab active" onclick="switchTab('ov', 'patterns')">Patterns</div>
+        <div class="modal-tab" onclick="switchTab('ov', 'stepbuilder')">Step Builder</div>
+        <div class="modal-tab" onclick="switchTab('ov', 'pitfalls')">Pitfalls</div>
+      </div>
+
+      <div id="ov-patterns" class="modal-tab-panel active">
+        <div class="modal-section">
+          <div class="modal-section-title">Telescoping Constructor Anti-Pattern</div>
+          <p class="modal-text">The problem Builder solves is commonly called the <b>telescoping constructor anti-pattern</b> — where you need multiple constructor overloads for every combination of optional parameters.</p>
+          <pre class="code-block" style="font-size:11.5px;"><span class="code-comment">// BEFORE — telescoping constructors (anti-pattern)</span>
+<span class="code-keyword">public</span> <span class="code-type">Document</span>(<span class="code-type">String</span> id, <span class="code-type">String</span> name) { ... }
+<span class="code-keyword">public</span> <span class="code-type">Document</span>(<span class="code-type">String</span> id, <span class="code-type">String</span> name, <span class="code-type">String</span> type) { ... }
+<span class="code-keyword">public</span> <span class="code-type">Document</span>(<span class="code-type">String</span> id, <span class="code-type">String</span> name, <span class="code-type">String</span> type, <span class="code-type">String</span> status) { ... }
+<span class="code-comment">// Grows infinitely for each new optional field</span>
+
+<span class="code-comment">// AFTER — single builder, readable, extensible</span>
+<span class="code-type">Document</span> doc = <span class="code-type">Document</span>.<span class="code-method">builder</span>()
+    .<span class="code-method">id</span>(<span class="code-string">"doc-001"</span>)
+    .<span class="code-method">name</span>(<span class="code-string">"Report.pdf"</span>)
+    .<span class="code-method">build</span>();</pre>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Generic Builder Pattern (Reusable)</div>
+          <pre class="code-block" style="font-size:11.5px;"><span class="code-keyword">public abstract class</span> <span class="code-type">AbstractBuilder</span>&lt;<span class="code-type">T</span>, <span class="code-type">B</span> <span class="code-keyword">extends</span> <span class="code-type">AbstractBuilder</span>&lt;<span class="code-type">T</span>,<span class="code-type">B</span>&gt;&gt; {
+    <span class="code-annotation">@SuppressWarnings</span>(<span class="code-string">"unchecked"</span>)
+    <span class="code-keyword">protected</span> <span class="code-type">B</span> <span class="code-method">self</span>() { <span class="code-keyword">return</span> (<span class="code-type">B</span>) <span class="code-keyword">this</span>; }
+    <span class="code-keyword">public abstract</span> <span class="code-type">T</span> <span class="code-method">build</span>();
+}
+
+<span class="code-keyword">public class</span> <span class="code-type">ReportBuilder</span> <span class="code-keyword">extends</span> <span class="code-type">AbstractBuilder</span>&lt;<span class="code-type">Report</span>, <span class="code-type">ReportBuilder</span>&gt; {
+    <span class="code-keyword">private</span> <span class="code-type">String</span> title;
+    <span class="code-keyword">public</span> <span class="code-type">ReportBuilder</span> <span class="code-method">title</span>(<span class="code-type">String</span> t) { <span class="code-keyword">this</span>.title = t; <span class="code-keyword">return</span> <span class="code-method">self</span>(); }
+    <span class="code-keyword">public</span> <span class="code-type">Report</span> <span class="code-method">build</span>()           { <span class="code-keyword">return new</span> <span class="code-type">Report</span>(title); }
+}</pre>
+        </div>
+        <div class="key-reminder"><b>Key Reminder:</b> The <code style="font-family:IBM Plex Mono;font-size:12px">self()</code> trick in generic builders avoids unchecked casts everywhere and keeps chaining correct through inheritance hierarchies.</div>
+      </div>
+
+      <div id="ov-stepbuilder" class="modal-tab-panel">
+        <div class="modal-section">
+          <div class="modal-section-title">Step Builder — Enforcing Required Fields at Compile Time</div>
+          <p class="modal-text">The <b>Step Builder</b> variant uses separate interfaces per step to enforce that required fields are set before optional ones — a compile-time guarantee rather than a runtime exception.</p>
+          <pre class="code-block" style="font-size:11.5px;"><span class="code-comment">// Each step interface returns the NEXT step</span>
+<span class="code-keyword">public interface</span> <span class="code-type">IdStep</span>   { <span class="code-type">NameStep</span> <span class="code-method">id</span>(<span class="code-type">String</span> id); }
+<span class="code-keyword">public interface</span> <span class="code-type">NameStep</span> { <span class="code-type">TypeStep</span> <span class="code-method">name</span>(<span class="code-type">String</span> name); }
+<span class="code-keyword">public interface</span> <span class="code-type">TypeStep</span> { <span class="code-type">BuildStep</span> <span class="code-method">type</span>(<span class="code-type">String</span> type); }
+<span class="code-keyword">public interface</span> <span class="code-type">BuildStep</span> {
+    <span class="code-type">BuildStep</span> <span class="code-method">status</span>(<span class="code-type">String</span> s);  <span class="code-comment">// optional</span>
+    <span class="code-type">Document</span>  <span class="code-method">build</span>();
+}
+
+<span class="code-comment">// Compiler forces correct order — missing id() won't compile</span>
+<span class="code-type">Document</span> d = <span class="code-type">DocumentStepBuilder</span>
+    .<span class="code-method">newBuilder</span>()   <span class="code-comment">// returns IdStep</span>
+    .<span class="code-method">id</span>(<span class="code-string">"doc-1"</span>)    <span class="code-comment">// returns NameStep</span>
+    .<span class="code-method">name</span>(<span class="code-string">"file"</span>)  <span class="code-comment">// returns TypeStep</span>
+    .<span class="code-method">type</span>(<span class="code-string">"PDF"</span>)   <span class="code-comment">// returns BuildStep</span>
+    .<span class="code-method">build</span>();</pre>
+          <div class="tip-box">✓ <b>Use Step Builder</b> when certain fields are truly required and you want compile-time enforcement rather than relying on runtime validation in build().</div>
+        </div>
+      </div>
+
+      <div id="ov-pitfalls" class="modal-tab-panel">
+        <div class="modal-section">
+          <div class="modal-section-title">Common Pitfalls & How to Avoid Them</div>
+          <div class="warning-box" style="margin-bottom:10px;">⚠ <b>Pitfall 1 — Shared Builder Instance:</b> Never store a builder as a field and reuse it across threads. Builders are NOT thread-safe by default.</div>
+          <div class="warning-box" style="margin-bottom:10px;">⚠ <b>Pitfall 2 — Silent Null Fields:</b> If you don't validate in build(), null fields silently produce broken objects. Always assert required fields.</div>
+          <div class="warning-box" style="margin-bottom:10px;">⚠ <b>Pitfall 3 — Mutable Collections:</b> If a field is a List, copy it defensively: <code style="font-family:IBM Plex Mono;font-size:12px">List.copyOf(tags)</code> in build().</div>
+          <div class="warning-box">⚠ <b>Pitfall 4 — @Builder with @NonNull (Lombok):</b> Lombok's @NonNull generates null checks in the setter, but only if you also use @Builder — make sure both annotations are present.</div>
+        </div>
+        <pre class="code-block" style="font-size:11.5px;"><span class="code-comment">// Defensive copy for collection fields</span>
+<span class="code-keyword">public</span> <span class="code-type">Document</span> <span class="code-method">build</span>() {
+    <span class="code-type">Objects</span>.<span class="code-method">requireNonNull</span>(name, <span class="code-string">"name"</span>);
+    <span class="code-type">Objects</span>.<span class="code-method">requireNonNull</span>(type, <span class="code-string">"type"</span>);
+    <span class="code-type">List</span>&lt;<span class="code-type">String</span>&gt; safeTags = tags == <span class="code-keyword">null</span>
+        ? <span class="code-type">List</span>.<span class="code-method">of</span>()
+        : <span class="code-type">List</span>.<span class="code-method">copyOf</span>(tags);  <span class="code-comment">// immutable copy</span>
+    <span class="code-keyword">return new</span> <span class="code-type">Document</span>(id, name, type, status, valid, safeTags);
+}</pre>
+      </div>
+    </div>
   </div>
+</div>
 
-  <!-- ERROR HANDLING -->
-  <div class="mt-6">
-    <h3 class="text-xl font-bold mb-3">Validation Error Handling</h3>
+<!-- BUILDER MODAL -->
+<div id="modal-builder" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-header-title">Builder Interface — Advanced Examples</span>
+      <button class="modal-close" onclick="closeModal('modal-builder')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">Builder with Conditional Logic</div>
+        <p class="modal-text">Builders can encapsulate complex conditional logic before constructing the final object, keeping that complexity out of callers.</p>
+        <pre class="code-block" style="font-size:11.5px;"><span class="code-keyword">public</span> <span class="code-type">Document</span> <span class="code-method">build</span>() {
+    <span class="code-comment">// Auto-generate ID if not provided</span>
+    <span class="code-keyword">if</span> (id == <span class="code-keyword">null</span>)
+        id = <span class="code-type">UUID</span>.<span class="code-method">randomUUID</span>().toString();
 
-<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto">
-@RestControllerAdvice
-public class GlobalExceptionHandler {
+    <span class="code-comment">// Infer type from name extension if not set</span>
+    <span class="code-keyword">if</span> (type == <span class="code-keyword">null</span> && name != <span class="code-keyword">null</span>) {
+        type = name.endsWith(<span class="code-string">".pdf"</span>)  ? <span class="code-string">"PDF"</span>  :
+               name.endsWith(<span class="code-string">".docx"</span>) ? <span class="code-string">"DOCX"</span> : <span class="code-string">"UNKNOWN"</span>;
+    }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map&lt;String, String&gt; handleValidationErrors(
-            MethodArgumentNotValidException ex) {
+    <span class="code-comment">// Validation gate</span>
+    <span class="code-type">Objects</span>.<span class="code-method">requireNonNull</span>(name, <span class="code-string">"name is required"</span>);
+    <span class="code-keyword">if</span> (<span class="code-string">"UNKNOWN"</span>.equals(type))
+        <span class="code-keyword">throw new</span> <span class="code-type">IllegalStateException</span>(<span class="code-string">"Unsupported document type"</span>);
 
-        Map&lt;String, String&gt; errors = new HashMap<>();
+    <span class="code-keyword">return new</span> <span class="code-type">Document</span>(id, name, type,
+        status != <span class="code-keyword">null</span> ? status : <span class="code-string">"RECEIVED"</span>, valid);
+}</pre>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Builder Pattern in Spring Services</div>
+        <pre class="code-block" style="font-size:11.5px;"><span class="code-annotation">@Service</span>
+<span class="code-keyword">public class</span> <span class="code-type">DocumentService</span> {
 
-        ex.getBindingResult().getFieldErrors()
-          .forEach(error ->
-              errors.put(error.getField(), error.getDefaultMessage())
-          );
+    <span class="code-keyword">public</span> <span class="code-type">Document</span> <span class="code-method">ingest</span>(<span class="code-type">DocumentRequest</span> req) {
+        <span class="code-keyword">return</span> <span class="code-type">Document</span>.<span class="code-method">builder</span>()
+            .<span class="code-method">id</span>(<span class="code-type">UUID</span>.<span class="code-method">randomUUID</span>().toString())
+            .<span class="code-method">name</span>(req.name())
+            .<span class="code-method">type</span>(req.type())
+            .<span class="code-method">status</span>(<span class="code-string">"RECEIVED"</span>)
+            .<span class="code-method">valid</span>(<span class="code-method">isValid</span>(req))
+            .<span class="code-method">build</span>();
+    }
 
-        return errors;
+    <span class="code-keyword">private boolean</span> <span class="code-method">isValid</span>(<span class="code-type">DocumentRequest</span> r) {
+        <span class="code-keyword">return</span> r.name() != <span class="code-keyword">null</span>
+            && !r.name().isBlank()
+            && r.content().length() >= 5;
+    }
+}</pre>
+      </div>
+      <div class="key-reminder"><b>Key Reminder:</b> Keep business logic (like isValid) out of the Builder itself. The Builder handles construction; the Service handles business rules.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DTO MODAL -->
+<div id="modal-dto" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-header-title">Java Records — Advanced Patterns</span>
+      <button class="modal-close" onclick="closeModal('modal-dto')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">Records vs. Traditional POJOs</div>
+        <div class="detail-grid">
+          <div class="detail-card">
+            <div class="detail-card-label">Traditional POJO (150+ lines)</div>
+            <div class="detail-card-text">Requires manual: constructor, getters, equals(), hashCode(), toString(), copy constructors, builder inner class.</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-label">Java 21 Record (5 lines)</div>
+            <div class="detail-card-text">All of the above generated automatically. Immutable by default. Works perfectly with Jackson, JPA projections, and Spring.</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Record with Custom Accessor & Derived Field</div>
+        <pre class="code-block" style="font-size:11.5px;"><span class="code-keyword">public record</span> <span class="code-type">Document</span>(
+    <span class="code-type">String</span>   id,
+    <span class="code-type">String</span>   name,
+    <span class="code-type">String</span>   type,
+    <span class="code-type">String</span>   status,
+    <span class="code-keyword">boolean</span>  valid,
+    <span class="code-type">Instant</span>  createdAt
+) {
+    <span class="code-comment">// Compact constructor — runs before auto-assignment</span>
+    <span class="code-keyword">public</span> <span class="code-type">Document</span> {
+        <span class="code-type">Objects</span>.<span class="code-method">requireNonNull</span>(id, <span class="code-string">"id"</span>);
+        name = name == <span class="code-keyword">null</span> ? <span class="code-string">"Untitled"</span> : name.strip();
+        createdAt = createdAt != <span class="code-keyword">null</span> ? createdAt : <span class="code-type">Instant</span>.<span class="code-method">now</span>();
+    }
+
+    <span class="code-comment">// Custom accessor (overrides generated one)</span>
+    <span class="code-keyword">public</span> <span class="code-type">String</span> <span class="code-method">name</span>() { <span class="code-keyword">return</span> name.toUpperCase(); }
+
+    <span class="code-comment">// Derived / computed method</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isProcessable</span>() {
+        <span class="code-keyword">return</span> valid && <span class="code-string">"RECEIVED"</span>.equals(status);
+    }
+
+    <span class="code-comment">// Static factory</span>
+    <span class="code-keyword">public static</span> <span class="code-type">DocumentBuilder</span> <span class="code-method">builder</span>() {
+        <span class="code-keyword">return new</span> <span class="code-type">DefaultBuilder</span>();
+    }
+}</pre>
+      </div>
+      <div class="key-reminder"><b>Key Reminder:</b> Records work natively with <b>pattern matching</b> in Java 21 switch expressions and instanceof checks — ideal for routing logic based on document type.</div>
+      <div class="warning-box" style="margin-top:10px;">⚠ Records cannot extend classes (they implicitly extend java.lang.Record). Use interfaces for polymorphism with records.</div>
+    </div>
+  </div>
+</div>
+
+<!-- VALIDATION MODAL -->
+<div id="modal-validation" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-header-title">Jakarta Validation — Advanced Constraints</span>
+      <button class="modal-close" onclick="closeModal('modal-validation')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">Custom Constraint Annotation</div>
+        <p class="modal-text">When built-in annotations aren't enough, define your own <b>custom constraint</b> — for example, validating that a document name matches an allowed naming convention.</p>
+        <pre class="code-block" style="font-size:11.5px;"><span class="code-comment">// 1. Define the annotation</span>
+<span class="code-annotation">@Documented</span>
+<span class="code-annotation">@Constraint</span>(validatedBy = ValidDocNameValidator.<span class="code-keyword">class</span>)
+<span class="code-annotation">@Target</span>({<span class="code-type">ElementType</span>.FIELD})
+<span class="code-annotation">@Retention</span>(<span class="code-type">RetentionPolicy</span>.RUNTIME)
+<span class="code-keyword">public @interface</span> <span class="code-type">ValidDocName</span> {
+    <span class="code-type">String</span>   message()  <span class="code-keyword">default</span> <span class="code-string">"Invalid doc name format"</span>;
+    <span class="code-type">Class</span>[]  groups()   <span class="code-keyword">default</span> {};
+    <span class="code-type">Class</span>[]  payload()  <span class="code-keyword">default</span> {};
+}
+
+<span class="code-comment">// 2. Implement the validator</span>
+<span class="code-keyword">public class</span> <span class="code-type">ValidDocNameValidator</span>
+    <span class="code-keyword">implements</span> <span class="code-type">ConstraintValidator</span>&lt;<span class="code-type">ValidDocName</span>, <span class="code-type">String</span>&gt; {
+
+    <span class="code-keyword">private static final</span> <span class="code-type">Pattern</span> PATTERN =
+        <span class="code-type">Pattern</span>.<span class="code-method">compile</span>(<span class="code-string">"^[A-Za-z0-9_\\-]+\\.(pdf|docx|txt)$"</span>);
+
+    <span class="code-keyword">public boolean</span> <span class="code-method">isValid</span>(<span class="code-type">String</span> v, <span class="code-type">ConstraintValidatorContext</span> ctx) {
+        <span class="code-keyword">return</span> v != <span class="code-keyword">null</span> && PATTERN.<span class="code-method">matcher</span>(v).<span class="code-method">matches</span>();
     }
 }
-</pre>
 
+<span class="code-comment">// 3. Use it like any other annotation</span>
+<span class="code-keyword">public record</span> <span class="code-type">DocumentRequest</span>(
+    <span class="code-annotation">@ValidDocName</span> <span class="code-type">String</span> name,
+    <span class="code-annotation">@NotBlank</span>     <span class="code-type">String</span> content
+) {}</pre>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Global Exception Handler for Validation Errors</div>
+        <pre class="code-block" style="font-size:11.5px;"><span class="code-annotation">@RestControllerAdvice</span>
+<span class="code-keyword">public class</span> <span class="code-type">ValidationExceptionHandler</span> {
+
+    <span class="code-annotation">@ExceptionHandler</span>(<span class="code-type">MethodArgumentNotValidException</span>.<span class="code-keyword">class</span>)
+    <span class="code-keyword">public</span> <span class="code-type">ResponseEntity</span>&lt;<span class="code-type">Map</span>&lt;<span class="code-type">String</span>,<span class="code-type">String</span>&gt;&gt; <span class="code-method">handle</span>(
+        <span class="code-type">MethodArgumentNotValidException</span> ex) {
+
+        <span class="code-type">Map</span>&lt;<span class="code-type">String</span>,<span class="code-type">String</span>&gt; errors = ex.<span class="code-method">getBindingResult</span>()
+            .<span class="code-method">getFieldErrors</span>().<span class="code-method">stream</span>()
+            .<span class="code-method">collect</span>(<span class="code-type">Collectors</span>.<span class="code-method">toMap</span>(
+                <span class="code-type">FieldError</span>::<span class="code-method">getField</span>,
+                <span class="code-type">FieldError</span>::<span class="code-method">getDefaultMessage</span>
+            ));
+
+        <span class="code-keyword">return</span> <span class="code-type">ResponseEntity</span>.<span class="code-method">badRequest</span>().<span class="code-method">body</span>(errors);
+    }
+}</pre>
+      </div>
+      <div class="key-reminder"><b>Key Reminder:</b> <code style="font-family:IBM Plex Mono;font-size:12px">@NotNull</code> rejects null only. <code style="font-family:IBM Plex Mono;font-size:12px">@NotEmpty</code> rejects null and empty string/collection. <code style="font-family:IBM Plex Mono;font-size:12px">@NotBlank</code> rejects null, empty, AND whitespace-only strings. Choose carefully.</div>
+    </div>
   </div>
+</div>
 
-  <!-- LOMBOK -->
-  <div class="mt-8">
-    <h3 class="text-xl font-bold mb-3">Lombok Builder Alternative</h3>
+<!-- LOMBOK MODAL -->
+<div id="modal-lombok" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-header-title">Lombok — Advanced Patterns & Pitfalls</span>
+      <button class="modal-close" onclick="closeModal('modal-lombok')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">@Builder with Validation via @Builder.ObtainVia</div>
+        <pre class="code-block" style="font-size:11.5px;"><span class="code-annotation">@Value</span>
+<span class="code-annotation">@Builder</span>
+<span class="code-keyword">public class</span> <span class="code-type">DocumentDTO</span> {
 
-<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto">
-import lombok.Builder;
-import lombok.Value;
+    <span class="code-annotation">@NonNull</span>                    <span class="code-comment">// Lombok null check in setter</span>
+    <span class="code-type">String</span> id;
 
-@Value
-@Builder
-public class DocumentResponse {
-    String documentId;
-    String fileName;
-    String status;
+    <span class="code-annotation">@NonNull</span>
+    <span class="code-type">String</span> name;
+
+    <span class="code-annotation">@Builder.Default</span>            <span class="code-comment">// Default if not set by caller</span>
+    <span class="code-type">String</span> status = <span class="code-string">"PENDING"</span>;
+
+    <span class="code-annotation">@Builder.Default</span>
+    <span class="code-type">Instant</span> createdAt = <span class="code-type">Instant</span>.<span class="code-method">now</span>();
+
+    <span class="code-annotation">@Singular</span>                   <span class="code-comment">// Generates addTag() / clearTags()</span>
+    <span class="code-type">List</span>&lt;<span class="code-type">String</span>&gt; tags;
 }
-</pre>
 
-    <p class="mt-3 text-sm">
-      Lombok removes boilerplate and auto-generates builder code.
-    </p>
-  </div>
+<span class="code-comment">// Usage with @Singular — add items one by one</span>
+<span class="code-type">DocumentDTO</span> doc = <span class="code-type">DocumentDTO</span>.<span class="code-method">builder</span>()
+    .<span class="code-method">id</span>(<span class="code-string">"d-001"</span>)
+    .<span class="code-method">name</span>(<span class="code-string">"Report.pdf"</span>)
+    .<span class="code-method">addTag</span>(<span class="code-string">"finance"</span>)
+    .<span class="code-method">addTag</span>(<span class="code-string">"q3"</span>)
+    .<span class="code-method">build</span>();</pre>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Non-Destructive Copies with toBuilder</div>
+        <pre class="code-block" style="font-size:11.5px;"><span class="code-comment">// toBuilder = true lets you clone and modify without mutation</span>
+<span class="code-type">DocumentDTO</span> original = <span class="code-type">DocumentDTO</span>.<span class="code-method">builder</span>()
+    .<span class="code-method">id</span>(<span class="code-string">"d-001"</span>).<span class="code-method">name</span>(<span class="code-string">"Draft.pdf"</span>).<span class="code-method">build</span>();
 
-  <!-- COMPARISON -->
-  <div class="mt-6 grid md:grid-cols-2 gap-4">
+<span class="code-comment">// Produce a new object with status changed — original untouched</span>
+<span class="code-type">DocumentDTO</span> approved = original.<span class="code-method">toBuilder</span>()
+    .<span class="code-method">status</span>(<span class="code-string">"APPROVED"</span>)
+    .<span class="code-method">build</span>();
 
-    <div class="p-4 rounded-xl bg-sky-50 dark:bg-slate-800 border">
-      <h4 class="font-bold">Manual Builder Interface</h4>
-      <ul class="text-sm mt-2 list-disc ml-5">
-        <li>Full control</li>
-        <li>Custom validation logic</li>
-        <li>Enterprise consistency</li>
-        <li>Better for complex systems</li>
-      </ul>
+<span class="code-comment">// original.status() still == "PENDING" — fully immutable</span></pre>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">⚠ Key Lombok Pitfalls</div>
+        <div class="warning-box" style="margin-bottom:8px;">⚠ <b>@Data vs @Value:</b> @Data generates mutable getters/setters. @Value makes all fields final and generates no setters. Prefer @Value for DTOs.</div>
+        <div class="warning-box" style="margin-bottom:8px;">⚠ <b>@Builder.Default doesn't work with @NonNull:</b> Lombok generates separate code paths; mixing them can cause NullPointerException in edge cases. Test explicitly.</div>
+        <div class="warning-box">⚠ <b>IDE annotation processing:</b> Lombok requires the annotation processor enabled in your IDE. Missing this causes "cannot find symbol" errors that aren't real compilation errors.</div>
+      </div>
+      <div class="key-reminder"><b>Key Reminder:</b> Lombok is a compile-time tool — it adds zero runtime overhead. All generated code is visible in the compiled .class files and in your IDE's "delombok" view.</div>
     </div>
-
-    <div class="p-4 rounded-xl bg-emerald-50 dark:bg-slate-800 border">
-      <h4 class="font-bold">Lombok Builder</h4>
-      <ul class="text-sm mt-2 list-disc ml-5">
-        <li>Less code</li>
-        <li>Faster development</li>
-        <li>Easy to read</li>
-        <li>Best for simple DTOs</li>
-      </ul>
-    </div>
-
   </div>
+</div>
 
-  <!-- BEST PRACTICES -->
-  <div class="mt-6 p-4 rounded-xl bg-yellow-50 dark:bg-slate-800 border border-yellow-200">
-    <h4 class="font-bold">Best Practices</h4>
-    <ul class="list-disc ml-5 mt-2 text-sm">
-      <li>Use <strong>Jakarta Validation</strong> on all incoming requests</li>
-      <li>Keep validation out of controllers</li>
-      <li>Use <strong>Lombok</strong> for simple DTOs</li>
-      <li>Use <strong>Builder Interface</strong> for complex domain objects</li>
-      <li>Keep services responsible for business logic</li>
-    </ul>
-  </div>
 
-</section>
+<script>
+  // Modal
+  function openModal(id)  { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  document.querySelectorAll('.modal-overlay').forEach(m =>
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); })
+  );
+
+  // Tabs
+  function switchTab(group, tab) {
+    const panels = document.querySelectorAll(`[id^="${group}-"]`);
+    const tabs   = document.querySelectorAll('.modal-tab');
+    panels.forEach(p => p.classList.remove('active'));
+    tabs.forEach(t => t.classList.remove('active'));
+    document.getElementById(`${group}-${tab}`).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Simulation
+  function simulate() {
+    const name    = document.getElementById('sim-name').value.trim();
+    const type    = document.getElementById('sim-type').value;
+    const content = document.getElementById('sim-content').value.trim();
+    const out     = document.getElementById('output');
+
+    const errors = [];
+    if (!name)            errors.push('ValidationError: name must not be blank (@NotBlank)');
+    if (content.length < 5 && content.length > 0)
+                          errors.push('ValidationError: content length ' + content.length + ' < 5 (@Size min=5)');
+    if (content.length > 5000) errors.push('ValidationError: content length ' + content.length + ' > 5000 (@Size max=5000)');
+    if (!content)         errors.push('ValidationError: content must not be blank (@NotBlank)');
+
+    if (errors.length) {
+      out.style.color = '#ff8389';
+      out.textContent = '// Build FAILED — Constraint violations:\n\n' + errors.join('\n');
+      return;
+    }
+
+    const result = {
+      "builder": "DefaultBuilder.build()",
+      "document": {
+        id:        crypto.randomUUID(),
+        name:      name,
+        type:      type,
+        status:    "RECEIVED",
+        valid:     true,
+        createdAt: new Date().toISOString(),
+        isProcessable: true
+      },
+      "validation": "PASSED",
+      "pipeline":   "INGESTION_QUEUE → PROCESSING → INDEXED"
+    };
+
+    out.style.color = '#42be65';
+    out.textContent = JSON.stringify(result, null, 2);
+  }
+
+  // Quiz
+  function checkQuiz() {
+    const q1 = document.querySelector('input[name="q1"]:checked');
+    const q2 = document.querySelector('input[name="q2"]:checked');
+    const q3 = document.querySelector('input[name="q3"]:checked');
+    const out = document.getElementById('quizOut');
+
+    if (!q1 || !q2 || !q3) {
+      out.style.display = 'block';
+      out.className = 'quiz-result quiz-wrong';
+      out.textContent = '⚠ Please answer all 3 questions before checking.';
+      return;
+    }
+
+    const score = [q1.value === 'b', q2.value === 'a', q3.value === 'c'].filter(Boolean).length;
+    out.style.display = 'block';
+
+    if (score === 3) {
+      out.className = 'quiz-result quiz-correct';
+      out.textContent = '✓ Perfect score! All 3 correct. You understand the Builder pattern, Lombok, and Jakarta Validation.';
+    } else {
+      out.className = 'quiz-result quiz-wrong';
+      out.textContent = `✗ ${score}/3 correct. Review the sections above. Hint: Q1→Object Creation, Q2→Non-destructive copies, Q3→@NotBlank handles whitespace.`;
+    }
+  }
+
+  // Sidebar scroll spy
+  function scrollTo(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+
+</body>
+</html>

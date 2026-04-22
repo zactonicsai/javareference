@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DevSecOps Cloud Platform — GitLab · GitHub · AWS · Azure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config={theme:{extend:{fontFamily:{mono:['"Share Tech Mono"','monospace'],display:['"Exo 2"','sans-serif'],body:['Rajdhani','sans-serif']}}}}
+</script>
+<style>
+  :root{--bg:#060d1a;--card:#0b1628;--panel:#0f1e36;--brd:#1a3050;--g:#00c896;--p:#ff27ad;--b:#3a6ec0;--y:#c0ec00;--or:#ff9f70;--gold:#ffb400;}
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:#c8dde8;font-family:'Rajdhani',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px)}
+  .grid-bg{background-image:linear-gradient(rgba(0,200,150,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,150,.03) 1px,transparent 1px);background-size:40px 40px}
+  /* cards */
+  .card{background:var(--card);border:1px solid var(--brd);border-radius:6px;transition:border-color .25s,box-shadow .25s,opacity .4s ease,transform .4s ease;opacity:0;transform:translateY(14px)}
+  .card.vis{opacity:1;transform:translateY(0)}
+  .card:hover{border-color:var(--g)}
+  .cg{border-left:3px solid var(--g)}.cb{border-left:3px solid var(--b)}.cp{border-left:3px solid var(--p)}.cy{border-left:3px solid var(--y)}.cor{border-left:3px solid var(--or)}.cgold{border-left:3px solid var(--gold)}
+  .glow-g{box-shadow:0 0 22px rgba(0,200,150,.2),0 0 60px rgba(0,200,150,.06)}
+  .glow-p{box-shadow:0 0 22px rgba(255,39,173,.2)}
+  .glow-b{box-shadow:0 0 22px rgba(58,110,192,.25)}
+  .tgg{text-shadow:0 0 14px rgba(0,200,150,.65)}.tgp{text-shadow:0 0 14px rgba(255,39,173,.65)}
+  /* tabs */
+  .tab-btn{transition:all .2s;color:#8aaec4;font-family:'Share Tech Mono',monospace}
+  .tab-btn.active{background:rgba(0,200,150,.14);border-color:var(--g)!important;color:var(--g)}
+  .tab-pane{display:none}.tab-pane.active{display:block}
+  /* misc */
+  .badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:2px 8px;border-radius:2px}
+  .ai-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,39,173,.1);border:1px solid rgba(255,39,173,.4);border-radius:12px;font-family:'Share Tech Mono',monospace;font-size:11px;padding:1px 8px;color:#ff8fd6}
+  .ttag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;padding:2px 7px;border-radius:3px;margin:2px}
+  .fl{position:absolute;top:-10px;left:12px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:1px 6px;background:var(--bg);color:var(--g);border:1px solid var(--g);border-radius:2px}
+  .bi{display:flex;gap:10px;align-items:flex-start;padding:5px 0;border-bottom:1px solid rgba(26,48,80,.4)}
+  .bi:last-child{border-bottom:none}
+  .dot{width:6px;height:6px;border-radius:50%;margin-top:8px;flex-shrink:0}
+  table{border-collapse:collapse;width:100%}
+  th{background:rgba(0,200,150,.09);color:var(--g);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px}
+  td,th{padding:8px 12px;border:1px solid var(--brd);text-align:left;font-size:13px}
+  tr:hover td{background:rgba(0,200,150,.03)}
+  .rt{overflow-x:auto}
+  code{color:#7dffd8;background:rgba(0,200,150,.1);padding:1px 5px;border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:12px}
+  .fa{animation:fa 3s linear infinite;stroke-dasharray:8 4}
+  @keyframes fa{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
+  @keyframes hi{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  .hl{animation:hi .7s ease both}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
+</style>
+</head>
+<body class="grid-bg min-h-screen">
+
+<!-- HERO -->
+<header class="relative py-10 px-6 border-b border-blue-900 overflow-hidden">
+  <div class="absolute inset-0 opacity-20" style="background:radial-gradient(ellipse 60% 100% at 15% 50%,rgba(0,200,150,.35),transparent),radial-gradient(ellipse 50% 80% at 85% 50%,rgba(255,39,173,.2),transparent)"></div>
+  <div class="relative max-w-7xl mx-auto">
+    <div class="hl" style="animation-delay:.05s"><span class="badge" style="background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.4);color:#00c896">⬡ ENTERPRISE DEVSECOPS PLATFORM</span></div>
+    <h1 class="hl text-4xl md:text-6xl font-display font-extrabold mt-2 tgg" style="color:#e8f4ff;animation-delay:.15s"><span style="color:#00c896">DevSecOps</span> Cloud Platform</h1>
+    <p class="hl text-xl mt-1" style="color:#8aaec4;animation-delay:.25s">GitLab CI · GitHub Actions · Deploy to AWS &amp; Azure · Kubernetes · AI-Augmented</p>
+    <div class="hl flex flex-wrap gap-2 mt-4" style="animation-delay:.35s">
+      <span class="ttag" style="background:rgba(36,41,47,.6);border:1px solid #444c56;color:#e6edf3">GitHub Actions</span>
+      <span class="ttag" style="background:rgba(252,109,38,.1);border:1px solid rgba(252,109,38,.4);color:#fc6d26">GitLab CI</span>
+      <span class="ttag" style="background:rgba(255,153,0,.1);border:1px solid rgba(255,153,0,.4);color:#ff9900">AWS (EKS · ECR · S3)</span>
+      <span class="ttag" style="background:rgba(0,114,198,.1);border:1px solid rgba(0,114,198,.4);color:#0078d4">Azure (AKS · ACR · Blob)</span>
+      <span class="ttag" style="background:rgba(58,110,192,.1);border:1px solid rgba(58,110,192,.3);color:#88a8d8">Kubernetes</span>
+      <span class="ttag" style="background:rgba(255,39,173,.1);border:1px solid rgba(255,39,173,.3);color:#ff8fd6">DevSecOps</span>
+      <span class="ttag" style="background:rgba(248,152,32,.08);border:1px solid rgba(248,152,32,.3);color:#f89820">Java Spring</span>
+      <span class="ttag" style="background:rgba(97,218,251,.08);border:1px solid rgba(97,218,251,.3);color:#61dafb">React</span>
+      <span class="ttag" style="background:rgba(0,173,216,.08);border:1px solid rgba(0,173,216,.3);color:#00add8">Golang</span>
+      <span class="ttag" style="background:rgba(222,165,132,.08);border:1px solid rgba(222,165,132,.3);color:#dea584">Rust</span>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="sticky top-0 z-50 border-b px-4" style="background:rgba(6,13,26,.96);backdrop-filter:blur(10px);border-color:#1a3050">
+  <div class="max-w-7xl mx-auto flex flex-wrap gap-1 py-2">
+    <button class="tab-btn active text-xs px-3 py-1.5 rounded border border-blue-900" onclick="sw('pipeline',event)">📦 Pipeline</button>
+    <button class="tab-btn text-xs px-3 py-1.5 rounded border border-blue-900" onclick="sw('k8s',event)">☸ K8s + Infra</button>
+    <button class="tab-btn text-xs px-3 py-1.5 rounded border border-blue-900" onclick="sw('roles',event)">👥 Roles &amp; Access</button>
+    <button class="tab-btn text-xs px-3 py-1.5 rounded border border-blue-900" onclick="sw('security',event)">🔐 Security</button>
+    <button class="tab-btn text-xs px-3 py-1.5 rounded border border-blue-900" onclick="sw('monitor',event)">📊 Monitoring</button>
+    <button class="tab-btn text-xs px-3 py-1.5 rounded border border-blue-900" onclick="sw('ai',event)">🤖 AI Enhancements</button>
+    <button class="tab-btn text-xs px-3 py-1.5 rounded border border-blue-900" onclick="sw('stacks',event)">💻 Tech Stacks</button>
+    <button class="tab-btn text-xs px-3 py-1.5 rounded border border-blue-900" onclick="sw('appdev',event)" style="border-color:rgba(255,180,0,.35);color:#ffb400">🧑‍💻 App Dev Lifecycle</button>
+  </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+
+<!-- ══════════════════════ PIPELINE ══════════════════════ -->
+<div id="tab-pipeline" class="tab-pane active">
+  <div class="mb-5">
+    <span class="badge" style="background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.4);color:#00c896">STAGE 01</span>
+    <h2 class="text-3xl font-display font-bold mt-1 tgg" style="color:#e8f4ff">CI/CD Pipeline — GitHub Actions &amp; GitLab CI</h2>
+    <p style="color:#8aaec4">Build → Test → Stage → Deploy to AWS EKS or Azure AKS — secure GitOps delivery</p>
+  </div>
+
+  <!-- DIAGRAM 1: Pipeline flow -->
+  <div class="card p-4 mb-5 overflow-x-auto glow-g" style="position:relative">
+    <div class="fl">PIPELINE FLOW — GITHUB ACTIONS / GITLAB CI → AWS OR AZURE</div>
+    <svg viewBox="0 0 1040 230" width="100%" style="min-width:740px;margin-top:14px" font-family="'Share Tech Mono',monospace">
+      <defs>
+        <marker id="ag" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 Z" fill="#00c896"/></marker>
+        <marker id="ab" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 Z" fill="#3a6ec0"/></marker>
+        <marker id="ap" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 Z" fill="#ff27ad"/></marker>
+        <marker id="ay" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 Z" fill="#c0ec00"/></marker>
+        <filter id="gf"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <linearGradient id="pipG" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#00c896" stop-opacity=".6"/>
+          <stop offset="100%" stop-color="#ff27ad" stop-opacity=".6"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Platform labels -->
+      <rect x="8" y="8" width="195" height="18" rx="3" fill="rgba(36,41,47,.6)" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+      <text x="105" y="21" text-anchor="middle" fill="#e6edf3" font-size="9" letter-spacing="1">GITHUB / GITLAB — SOURCE CONTROL</text>
+      <rect x="212" y="8" width="590" height="18" rx="3" fill="rgba(58,110,192,.08)" stroke="rgba(58,110,192,.25)" stroke-width="1"/>
+      <text x="507" y="21" text-anchor="middle" fill="#88a8d8" font-size="9" letter-spacing="1">CI/CD — GITHUB ACTIONS / GITLAB CI RUNNERS</text>
+      <rect x="812" y="8" width="220" height="18" rx="3" fill="rgba(0,200,150,.06)" stroke="rgba(0,200,150,.2)" stroke-width="1"/>
+      <text x="922" y="21" text-anchor="middle" fill="#7dffd8" font-size="9" letter-spacing="1">CLOUD — AWS / AZURE</text>
+
+      <!-- lane -->
+      <rect x="8" y="34" width="1024" height="118" rx="8" fill="rgba(0,0,0,.18)" stroke="#1a3050" stroke-width="1"/>
+      <line x1="55" y1="93" x2="985" y2="93" stroke="#1a3050" stroke-width="1.5"/>
+      <line x1="55" y1="93" x2="985" y2="93" stroke="url(#pipG)" stroke-width="1.5" class="fa" opacity=".7"/>
+
+      <!-- Security band -->
+      <rect x="8" y="160" width="1024" height="42" rx="4" fill="rgba(255,39,173,.04)" stroke="rgba(255,39,173,.18)" stroke-width="1" stroke-dasharray="4 3"/>
+      <text x="22" y="185" fill="#ff8fd6" font-size="8.5">🔐  SECURITY WOVEN IN ─ ─  SAST · SCA · Secret Scan (Gitleaks/GitLab) · DAST · Image Scan (ECR/ACR) · SBOM (Syft) · Cosign Sign · Compliance Gate ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</text>
+
+      <!-- Step boxes -->
+      <!-- 1: Dev Push -->
+      <g transform="translate(12,42)">
+        <rect width="88" height="92" rx="5" fill="#0b1628" stroke="#00c896" stroke-width="1.5" filter="url(#gf)"/>
+        <text x="44" y="28" text-anchor="middle" font-size="22">💻</text>
+        <text x="44" y="50" text-anchor="middle" fill="#00c896" font-size="9" font-weight="bold">DEV PUSH</text>
+        <text x="44" y="64" text-anchor="middle" fill="#5a7a96" font-size="8">git commit</text>
+        <text x="44" y="77" text-anchor="middle" fill="#5a7a96" font-size="8">pre-commit hooks</text>
+        <text x="44" y="89" text-anchor="middle" fill="#5a7a96" font-size="8">secret scan</text>
+      </g>
+      <path d="M100,93 L116,93" stroke="#00c896" stroke-width="1.5" marker-end="url(#ag)"/>
+
+      <!-- 2: PR / MR -->
+      <g transform="translate(118,42)">
+        <rect width="88" height="92" rx="5" fill="#0b1628" stroke="#3a6ec0" stroke-width="1.5" filter="url(#gf)"/>
+        <text x="44" y="28" text-anchor="middle" font-size="22">🔀</text>
+        <text x="44" y="50" text-anchor="middle" fill="#3a6ec0" font-size="9" font-weight="bold">PR / MR</text>
+        <text x="44" y="64" text-anchor="middle" fill="#5a7a96" font-size="8">code review</text>
+        <text x="44" y="77" text-anchor="middle" fill="#5a7a96" font-size="8">SAST · Semgrep</text>
+        <text x="44" y="89" text-anchor="middle" fill="#5a7a96" font-size="8">2 approvals</text>
+      </g>
+      <path d="M206,93 L222,93" stroke="#3a6ec0" stroke-width="1.5" marker-end="url(#ab)"/>
+
+      <!-- 3: Build -->
+      <g transform="translate(224,42)">
+        <rect width="88" height="92" rx="5" fill="#0b1628" stroke="#c0ec00" stroke-width="1.5" filter="url(#gf)"/>
+        <text x="44" y="28" text-anchor="middle" font-size="22">🔨</text>
+        <text x="44" y="50" text-anchor="middle" fill="#c0ec00" font-size="9" font-weight="bold">BUILD</text>
+        <text x="44" y="64" text-anchor="middle" fill="#5a7a96" font-size="8">compile · lint</text>
+        <text x="44" y="77" text-anchor="middle" fill="#5a7a96" font-size="8">Docker (BuildKit)</text>
+        <text x="44" y="89" text-anchor="middle" fill="#5a7a96" font-size="8">SBOM · Cosign</text>
+      </g>
+      <path d="M312,93 L328,93" stroke="#c0ec00" stroke-width="1.5" marker-end="url(#ay)"/>
+
+      <!-- 4: Test -->
+      <g transform="translate(330,42)">
+        <rect width="88" height="92" rx="5" fill="#0b1628" stroke="#ff9f70" stroke-width="1.5" filter="url(#gf)"/>
+        <text x="44" y="28" text-anchor="middle" font-size="22">🧪</text>
+        <text x="44" y="50" text-anchor="middle" fill="#ff9f70" font-size="9" font-weight="bold">TEST</text>
+        <text x="44" y="64" text-anchor="middle" fill="#5a7a96" font-size="8">unit · integration</text>
+        <text x="44" y="77" text-anchor="middle" fill="#5a7a96" font-size="8">DAST · k6 load</text>
+        <text x="44" y="89" text-anchor="middle" fill="#5a7a96" font-size="8">Playwright E2E</text>
+      </g>
+      <path d="M418,93 L434,93" stroke="#ff9f70" stroke-width="1.5" marker-end="url(#ag)"/>
+
+      <!-- 5: Registry -->
+      <g transform="translate(436,42)">
+        <rect width="88" height="92" rx="5" fill="#0b1628" stroke="#00c896" stroke-width="1.5" filter="url(#gf)"/>
+        <text x="44" y="28" text-anchor="middle" font-size="22">📦</text>
+        <text x="44" y="50" text-anchor="middle" fill="#00c896" font-size="9" font-weight="bold">REGISTRY</text>
+        <text x="44" y="64" text-anchor="middle" fill="#ff9900" font-size="8">ECR (AWS)</text>
+        <text x="44" y="77" text-anchor="middle" fill="#0078d4" font-size="8">ACR (Azure)</text>
+        <text x="44" y="89" text-anchor="middle" fill="#5a7a96" font-size="8">scan · sign</text>
+      </g>
+      <path d="M524,93 L540,93" stroke="#00c896" stroke-width="1.5" marker-end="url(#ag)"/>
+
+      <!-- 6: Staging -->
+      <g transform="translate(542,42)">
+        <rect width="88" height="92" rx="5" fill="#0b1628" stroke="#ff27ad" stroke-width="1.5" filter="url(#gf)"/>
+        <text x="44" y="28" text-anchor="middle" font-size="22">🎭</text>
+        <text x="44" y="50" text-anchor="middle" fill="#ff27ad" font-size="9" font-weight="bold">STAGING</text>
+        <text x="44" y="64" text-anchor="middle" fill="#5a7a96" font-size="8">ArgoCD GitOps</text>
+        <text x="44" y="77" text-anchor="middle" fill="#ff9900" font-size="8">EKS ns (AWS)</text>
+        <text x="44" y="89" text-anchor="middle" fill="#0078d4" font-size="8">AKS ns (Azure)</text>
+      </g>
+      <path d="M630,93 L646,93" stroke="#ff27ad" stroke-width="1.5" marker-end="url(#ap)"/>
+
+      <!-- 7: Gate -->
+      <g transform="translate(646,63)">
+        <polygon points="0,30 30,0 60,30 30,60" fill="#0b1628" stroke="#ffb400" stroke-width="1.5" filter="url(#gf)"/>
+        <text x="30" y="27" text-anchor="middle" fill="#ffb400" font-size="8" font-weight="bold">GATE</text>
+        <text x="30" y="39" text-anchor="middle" fill="#ffb400" font-size="9">✓</text>
+        <text x="30" y="72" text-anchor="middle" fill="#5a7a96" font-size="7.5">Mgr + SecChamp</text>
+      </g>
+      <path d="M706,93 L724,93" stroke="#ffb400" stroke-width="1.5" marker-end="url(#ag)"/>
+
+      <!-- 8: PROD -->
+      <g transform="translate(726,34)">
+        <rect width="106" height="118" rx="6" fill="#0b1628" stroke="#00c896" stroke-width="2.5" filter="url(#gf)"/>
+        <circle cx="53" cy="59" r="38" fill="none" stroke="rgba(0,200,150,.1)" stroke-width="24"/>
+        <text x="53" y="44" text-anchor="middle" font-size="26">🚀</text>
+        <text x="53" y="68" text-anchor="middle" fill="#00c896" font-size="11" font-weight="bold">PROD</text>
+        <text x="53" y="84" text-anchor="middle" fill="#ff9900" font-size="8">EKS (AWS)</text>
+        <text x="53" y="97" text-anchor="middle" fill="#0078d4" font-size="8">AKS (Azure)</text>
+        <text x="53" y="110" text-anchor="middle" fill="#5a7a96" font-size="8">Blue/Green · Canary</text>
+      </g>
+      <path d="M832,93 L850,93" stroke="#00c896" stroke-width="1.5" marker-end="url(#ag)"/>
+
+      <!-- 9: Monitor -->
+      <g transform="translate(852,42)">
+        <rect width="180" height="92" rx="5" fill="#0b1628" stroke="#88a8d8" stroke-width="1.5" filter="url(#gf)"/>
+        <text x="90" y="28" text-anchor="middle" font-size="22">📊</text>
+        <text x="90" y="50" text-anchor="middle" fill="#88a8d8" font-size="9" font-weight="bold">MONITOR</text>
+        <text x="90" y="64" text-anchor="middle" fill="#5a7a96" font-size="8">Prometheus · Grafana · Jaeger</text>
+        <text x="90" y="77" text-anchor="middle" fill="#ff9900" font-size="7.5">CloudWatch (AWS)</text>
+        <text x="90" y="89" text-anchor="middle" fill="#0078d4" font-size="7.5">Azure Monitor · App Insights</text>
+      </g>
+
+      <!-- Feedback loop -->
+      <path d="M942,134 Q942,215 530,215 Q120,215 56,134" stroke="#5a7a96" stroke-width="1" fill="none" stroke-dasharray="4 3" marker-end="url(#ag)" opacity=".5"/>
+      <text x="530" y="212" text-anchor="middle" fill="#5a7a96" font-size="8">← continuous feedback loop → next sprint</text>
+    </svg>
+  </div>
+
+  <!-- DIAGRAM 2: GitHub vs GitLab YAML side by side -->
+  <div class="card p-4 mb-5 overflow-x-auto glow-b" style="position:relative">
+    <div class="fl" style="color:#3a6ec0;border-color:#3a6ec0">GITHUB ACTIONS vs GITLAB CI — YAML ANATOMY + CLOUD AUTH</div>
+    <svg viewBox="0 0 980 280" width="100%" style="min-width:640px;margin-top:14px" font-family="'Share Tech Mono',monospace" font-size="10">
+      <defs>
+        <linearGradient id="codeG" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#1f2937"/>
+          <stop offset="100%" stop-color="#0b1628"/>
+        </linearGradient>
+      </defs>
+      <!-- GitHub side -->
+      <rect x="10" y="8" width="460" height="265" rx="6" fill="url(#codeG)" stroke="#333c4a" stroke-width="1.5"/>
+      <rect x="10" y="8" width="460" height="28" rx="6" fill="#1f2937"/>
+      <circle cx="28" cy="22" r="6" fill="#ff5f57"/><circle cx="46" cy="22" r="6" fill="#ffbd2e"/><circle cx="64" cy="22" r="6" fill="#28ca41"/>
+      <text x="240" y="26" text-anchor="middle" fill="#8aaec4" font-size="10" letter-spacing="1">GITHUB ACTIONS — .github/workflows/ci.yml</text>
+
+      <text x="22" y="56" fill="#ff7fce" font-size="9">name:</text><text x="70" y="56" fill="#d4ff00" font-size="9">ci-pipeline</text>
+      <text x="22" y="72" fill="#ff7fce" font-size="9">on:</text>
+      <text x="36" y="88" fill="#7dffd8" font-size="9">push:</text><text x="90" y="88" fill="#c8dde8" font-size="9">branches: [main, develop]</text>
+      <text x="36" y="104" fill="#7dffd8" font-size="9">pull_request:</text>
+      <text x="22" y="124" fill="#ff7fce" font-size="9">permissions:</text>
+      <text x="36" y="140" fill="#7dffd8" font-size="9">id-token:</text><text x="110" y="140" fill="#d4ff00" font-size="9">write</text>
+      <text x="36" y="156" fill="#7dffd8" font-size="9">contents:</text><text x="112" y="156" fill="#d4ff00" font-size="9">read</text>
+      <text x="22" y="176" fill="#ff7fce" font-size="9">jobs:</text>
+      <text x="36" y="192" fill="#7dffd8" font-size="9">build-and-push:</text>
+      <text x="50" y="208" fill="#88a8d8" font-size="9">runs-on:</text><text x="128" y="208" fill="#d4ff00" font-size="9">ubuntu-latest</text>
+      <text x="50" y="224" fill="#7dffd8" font-size="9">steps:</text>
+      <text x="64" y="240" fill="#ff9f70" font-size="9">- uses: actions/checkout@v4</text>
+      <text x="64" y="256" fill="#ff9f70" font-size="9">- uses: aws-actions/configure-aws-credentials@v4</text>
+      <text x="64" y="272" fill="#5a7a96" font-size="8">     # OIDC keyless → ECR push / EKS deploy</text>
+
+      <!-- OIDC badge AWS -->
+      <rect x="290" y="185" width="168" height="56" rx="4" fill="rgba(255,153,0,.08)" stroke="rgba(255,153,0,.3)" stroke-width="1"/>
+      <text x="374" y="204" text-anchor="middle" fill="#ff9900" font-size="8.5" font-weight="bold">AWS OIDC (keyless)</text>
+      <text x="374" y="219" text-anchor="middle" fill="#5a7a96" font-size="8">No long-lived creds in CI</text>
+      <text x="374" y="232" text-anchor="middle" fill="#5a7a96" font-size="8">assume-role via OIDC token</text>
+      <!-- Azure badge -->
+      <rect x="290" y="248" width="168" height="18" rx="3" fill="rgba(0,120,212,.1)" stroke="rgba(0,120,212,.4)" stroke-width="1"/>
+      <text x="374" y="261" text-anchor="middle" fill="#0078d4" font-size="8">azure/login@v2 — Workload Identity</text>
+
+      <!-- GitLab side -->
+      <rect x="510" y="8" width="460" height="265" rx="6" fill="url(#codeG)" stroke="#333c4a" stroke-width="1.5"/>
+      <rect x="510" y="8" width="460" height="28" rx="6" fill="#1f2937"/>
+      <circle cx="528" cy="22" r="6" fill="#ff5f57"/><circle cx="546" cy="22" r="6" fill="#ffbd2e"/><circle cx="564" cy="22" r="6" fill="#28ca41"/>
+      <text x="740" y="26" text-anchor="middle" fill="#8aaec4" font-size="10" letter-spacing="1">GITLAB CI — .gitlab-ci.yml</text>
+
+      <text x="522" y="56" fill="#ff7fce" font-size="9">stages:</text>
+      <text x="536" y="72" fill="#d4ff00" font-size="9">- test   - build   - scan   - deploy-staging   - deploy-prod</text>
+      <text x="522" y="92" fill="#ff7fce" font-size="9">variables:</text>
+      <text x="536" y="108" fill="#88a8d8" font-size="9">IMAGE_TAG:</text><text x="624" y="108" fill="#c8dde8" font-size="9">$CI_COMMIT_SHA</text>
+      <text x="536" y="124" fill="#88a8d8" font-size="9">AWS_ECR:</text><text x="615" y="124" fill="#c8dde8" font-size="9">$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com</text>
+      <text x="536" y="140" fill="#88a8d8" font-size="9">AZURE_ACR:</text><text x="624" y="140" fill="#c8dde8" font-size="9">$ACR_REGISTRY.azurecr.io</text>
+      <text x="522" y="160" fill="#ff7fce" font-size="9">sast:</text>
+      <text x="536" y="176" fill="#88a8d8" font-size="9">include:</text><text x="600" y="176" fill="#7dffd8" font-size="9">- template: Security/SAST.gitlab-ci.yml</text>
+      <text x="522" y="196" fill="#ff7fce" font-size="9">build-image:</text>
+      <text x="536" y="212" fill="#88a8d8" font-size="9">stage:</text><text x="596" y="212" fill="#d4ff00" font-size="9">build</text>
+      <text x="536" y="228" fill="#88a8d8" font-size="9">id_tokens:</text>
+      <text x="550" y="244" fill="#7dffd8" font-size="9">GITLAB_OIDC_TOKEN:</text><text x="694" y="244" fill="#d4ff00" font-size="9">aud: sigstore</text>
+      <text x="536" y="260" fill="#5a7a96" font-size="8"># → Cosign keyless sign + ECR/ACR push</text>
+
+      <!-- GitLab security suite badge -->
+      <rect x="770" y="185" width="180" height="76" rx="4" fill="rgba(252,109,38,.07)" stroke="rgba(252,109,38,.3)" stroke-width="1"/>
+      <text x="860" y="204" text-anchor="middle" fill="#fc6d26" font-size="8.5" font-weight="bold">GitLab Security Suite</text>
+      <text x="860" y="220" text-anchor="middle" fill="#5a7a96" font-size="7.5">SAST · DAST · Dependency Scan</text>
+      <text x="860" y="234" text-anchor="middle" fill="#5a7a96" font-size="7.5">Container Scan · Secret Detection</text>
+      <text x="860" y="248" text-anchor="middle" fill="#5a7a96" font-size="7.5">License Compliance</text>
+      <text x="860" y="262" text-anchor="middle" fill="#5a7a96" font-size="7.5">all built-in — no extra tools needed</text>
+    </svg>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card cg p-4">
+      <div class="flex items-center gap-2 mb-2"><span class="text-xl">💻</span><span class="badge" style="background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.3);color:#00c896">STEP 1</span><h3 class="font-display font-bold text-sm" style="color:#e8f4ff">Source Control &amp; Commit</h3></div>
+      <div class="space-y-0 text-sm">
+        <div class="bi"><div class="dot" style="background:#00c896"></div><span>GitHub or GitLab (cloud / self-hosted); <code>main</code> + <code>develop</code> branch protection enforced</span></div>
+        <div class="bi"><div class="dot" style="background:#00c896"></div><span>Pre-commit hooks (Husky / pre-commit framework): lint, format, secret scan (Gitleaks)</span></div>
+        <div class="bi"><div class="dot" style="background:#00c896"></div><span>Signed commits (GPG / SSH) for non-repudiation and audit trail</span></div>
+        <div class="bi"><div class="dot" style="background:#00c896"></div><span>CODEOWNERS auto-assigns domain reviewers; min 2 approvals required before merge</span></div>
+      </div>
+      <div class="mt-2 flex flex-wrap gap-1"><span class="ai-chip">🤖 AI: CodeRabbit PR review</span><span class="ai-chip">🤖 AI: secret NLP detect</span></div>
+    </div>
+    <div class="card cb p-4">
+      <div class="flex items-center gap-2 mb-2"><span class="text-xl">🔨</span><span class="badge" style="background:rgba(58,110,192,.1);border:1px solid rgba(58,110,192,.3);color:#3a6ec0">STEP 2</span><h3 class="font-display font-bold text-sm" style="color:#e8f4ff">Build + SAST (GitHub Actions / GitLab CI)</h3></div>
+      <div class="space-y-0 text-sm">
+        <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>GitHub Actions workflow or GitLab CI pipeline triggers on push/PR — parallel amd64 + arm64 matrix</span></div>
+        <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>SAST: Semgrep, SonarQube, Checkmarx; GitLab ships SAST built-in via templates</span></div>
+        <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>SCA: Snyk / Dependabot (GitHub) / GitLab Dependency Scan for dependency CVEs</span></div>
+        <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>Container image → ECR (AWS) or ACR (Azure) via OIDC keyless — no static credentials in CI</span></div>
+      </div>
+      <div class="mt-2 flex flex-wrap gap-1"><span class="ai-chip">🤖 AI: smart test select</span><span class="ai-chip">🤖 AI: fail prediction</span></div>
+    </div>
+    <div class="card cy p-4">
+      <div class="flex items-center gap-2 mb-2"><span class="text-xl">🧪</span><span class="badge" style="background:rgba(192,236,0,.1);border:1px solid rgba(192,236,0,.3);color:#c0ec00">STEP 3</span><h3 class="font-display font-bold text-sm" style="color:#e8f4ff">Test — Ephemeral K8s Namespace per PR</h3></div>
+      <div class="space-y-0 text-sm">
+        <div class="bi"><div class="dot" style="background:#c0ec00"></div><span>Ephemeral namespace in EKS (AWS) or AKS (Azure) per PR; fully isolated; auto-teardown</span></div>
+        <div class="bi"><div class="dot" style="background:#c0ec00"></div><span>Unit, integration (Testcontainers/Pact), E2E (Playwright/Appium) all run in pipeline</span></div>
+        <div class="bi"><div class="dot" style="background:#c0ec00"></div><span>OWASP ZAP DAST authenticated scan against deployed test environment per PR</span></div>
+        <div class="bi"><div class="dot" style="background:#c0ec00"></div><span>k6 / Locust performance test on staging; P99 regression gate blocks merge</span></div>
+      </div>
+      <div class="mt-2 flex flex-wrap gap-1"><span class="ai-chip">🤖 AI: test gen</span><span class="ai-chip">🤖 AI: flaky detect</span></div>
+    </div>
+    <div class="card cp p-4">
+      <div class="flex items-center gap-2 mb-2"><span class="text-xl">🚀</span><span class="badge" style="background:rgba(255,39,173,.1);border:1px solid rgba(255,39,173,.3);color:#ff27ad">STEP 4–5</span><h3 class="font-display font-bold text-sm" style="color:#e8f4ff">Staging → Production via ArgoCD GitOps</h3></div>
+      <div class="space-y-0 text-sm">
+        <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>ArgoCD syncs Helm chart from GitHub / GitLab repo to staging namespace (EKS or AKS)</span></div>
+        <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Prod approval via GitHub Environments or GitLab Protected Environments; App Manager + SecChamp sign-off</span></div>
+        <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Argo Rollouts: Blue/Green or Canary — traffic weighted via Ingress (ALB / Azure LB)</span></div>
+        <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Rollback = git revert → ArgoCD re-syncs previous image tag in &lt;2 minutes</span></div>
+      </div>
+      <div class="mt-2 flex flex-wrap gap-1"><span class="ai-chip">🤖 AI: canary ML analysis</span><span class="ai-chip">🤖 AI: auto-rollback</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ K8S ══════════════════════ -->
+<div id="tab-k8s" class="tab-pane">
+  <div class="mb-5">
+    <span class="badge" style="background:rgba(58,110,192,.1);border:1px solid rgba(58,110,192,.4);color:#3a6ec0">☸ KUBERNETES + CLOUD</span>
+    <h2 class="text-3xl font-display font-bold mt-1" style="color:#e8f4ff">Cluster Architecture — AWS EKS &amp; Azure AKS</h2>
+  </div>
+
+  <!-- DIAGRAM: K8s architecture -->
+  <div class="card p-4 mb-5 overflow-x-auto glow-b" style="position:relative">
+    <div class="fl" style="color:#3a6ec0;border-color:#3a6ec0">KUBERNETES CLUSTER ARCHITECTURE (AWS EKS / AZURE AKS)</div>
+    <svg viewBox="0 0 1020 420" width="100%" style="min-width:720px;margin-top:14px" font-family="'Share Tech Mono',monospace" font-size="10">
+      <defs>
+        <marker id="ka" markerWidth="6" markerHeight="6" refX="4" refY="2.5" orient="auto"><path d="M0,0 L0,5 L6,2.5 Z" fill="#00c896"/></marker>
+        <marker id="kb" markerWidth="6" markerHeight="6" refX="4" refY="2.5" orient="auto"><path d="M0,0 L0,5 L6,2.5 Z" fill="#3a6ec0"/></marker>
+      </defs>
+
+      <!-- Users -->
+      <rect x="5" y="12" width="100" height="58" rx="5" fill="#0b1628" stroke="#5a7a96" stroke-width="1"/>
+      <text x="55" y="38" text-anchor="middle" font-size="20">🌐</text>
+      <text x="55" y="56" text-anchor="middle" fill="#8aaec4" font-size="8.5">Users</text>
+      <text x="55" y="67" text-anchor="middle" fill="#5a7a96" font-size="7.5">Web · Mobile · Desktop</text>
+
+      <!-- WAF/CDN -->
+      <rect x="118" y="12" width="118" height="58" rx="5" fill="#0b1628" stroke="#ff27ad" stroke-width="1.2"/>
+      <text x="177" y="34" text-anchor="middle" font-size="18">🛡️</text>
+      <text x="177" y="52" text-anchor="middle" fill="#ff8fd6" font-size="8.5">WAF + CDN</text>
+      <text x="177" y="64" text-anchor="middle" fill="#5a7a96" font-size="7.5">CloudFront / Front Door</text>
+      <path d="M105,41 L118,41" stroke="#5a7a96" stroke-width="1" marker-end="url(#ka)"/>
+
+      <!-- Ingress/LB -->
+      <rect x="248" y="12" width="118" height="58" rx="5" fill="#0b1628" stroke="#3a6ec0" stroke-width="1.5"/>
+      <text x="307" y="34" text-anchor="middle" font-size="18">⚖️</text>
+      <text x="307" y="52" text-anchor="middle" fill="#88a8d8" font-size="8.5">Ingress / LB</text>
+      <text x="307" y="64" text-anchor="middle" fill="#5a7a96" font-size="7.5">ALB (AWS) / Azure LB</text>
+      <path d="M236,41 L248,41" stroke="#ff27ad" stroke-width="1" marker-end="url(#kb)"/>
+      <path d="M366,41 L386,41" stroke="#3a6ec0" stroke-width="1" marker-end="url(#ka)"/>
+
+      <!-- K8s cluster outer -->
+      <rect x="382" y="5" width="630" height="410" rx="8" fill="rgba(0,200,150,.025)" stroke="#00c896" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text x="397" y="20" fill="#00c896" font-size="9">KUBERNETES CLUSTER — private node groups (EKS Managed / AKS Node Pool)</text>
+
+      <!-- NS: production -->
+      <rect x="390" y="28" width="290" height="186" rx="5" fill="rgba(0,200,150,.04)" stroke="#00c896" stroke-width="1"/>
+      <text x="405" y="44" fill="#00c896" font-size="8">NS: production</text>
+      <!-- Pods row 1 -->
+      <rect x="396" y="52" width="82" height="52" rx="4" fill="#0b1628" stroke="#f89820" stroke-width="1"/>
+      <text x="437" y="74" text-anchor="middle" fill="#f89820" font-size="8">☕ Java</text>
+      <text x="437" y="87" text-anchor="middle" fill="#5a7a96" font-size="7">Spring Boot API</text>
+      <rect x="490" y="52" width="82" height="52" rx="4" fill="#0b1628" stroke="#61dafb" stroke-width="1"/>
+      <text x="531" y="74" text-anchor="middle" fill="#61dafb" font-size="8">⚛️ React</text>
+      <text x="531" y="87" text-anchor="middle" fill="#5a7a96" font-size="7">Next.js + Nginx</text>
+      <rect x="584" y="52" width="82" height="52" rx="4" fill="#0b1628" stroke="#00add8" stroke-width="1"/>
+      <text x="625" y="74" text-anchor="middle" fill="#00add8" font-size="8">🐹 Go</text>
+      <text x="625" y="87" text-anchor="middle" fill="#5a7a96" font-size="7">gRPC sidecar</text>
+      <!-- Pods row 2 -->
+      <rect x="396" y="116" width="82" height="52" rx="4" fill="#0b1628" stroke="#dea584" stroke-width="1"/>
+      <text x="437" y="138" text-anchor="middle" fill="#dea584" font-size="8">⚙️ Rust</text>
+      <text x="437" y="151" text-anchor="middle" fill="#5a7a96" font-size="7">high-perf workers</text>
+      <rect x="490" y="116" width="82" height="52" rx="4" fill="#0b1628" stroke="#00c896" stroke-width="1"/>
+      <text x="531" y="138" text-anchor="middle" fill="#7dffd8" font-size="8">🔀 API GW</text>
+      <text x="531" y="151" text-anchor="middle" fill="#5a7a96" font-size="7">Kong / Traefik</text>
+      <rect x="584" y="116" width="82" height="52" rx="4" fill="#0b1628" stroke="#ff27ad" stroke-width="1"/>
+      <text x="625" y="138" text-anchor="middle" fill="#ff8fd6" font-size="8">🕸 Istio</text>
+      <text x="625" y="151" text-anchor="middle" fill="#5a7a96" font-size="7">mTLS mesh</text>
+      <!-- Kyverno / Network Policies -->
+      <rect x="396" y="180" width="270" height="26" rx="3" fill="rgba(0,200,150,.06)" stroke="rgba(0,200,150,.3)" stroke-width="1"/>
+      <text x="531" y="197" text-anchor="middle" fill="#7dffd8" font-size="7.5">Kyverno policies · Pod Security Admission (Restricted) · Network Policies (Calico)</text>
+
+      <!-- NS: monitoring -->
+      <rect x="390" y="224" width="290" height="182" rx="5" fill="rgba(58,110,192,.04)" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="405" y="240" fill="#3a6ec0" font-size="8">NS: monitoring / observability</text>
+      <rect x="396" y="248" width="82" height="44" rx="3" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="437" y="268" text-anchor="middle" fill="#88a8d8" font-size="8">Prometheus</text>
+      <text x="437" y="281" text-anchor="middle" fill="#5a7a96" font-size="7.5">+ Alertmanager</text>
+      <rect x="490" y="248" width="82" height="44" rx="3" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="531" y="268" text-anchor="middle" fill="#88a8d8" font-size="8">Grafana</text>
+      <text x="531" y="281" text-anchor="middle" fill="#5a7a96" font-size="7.5">dashboards</text>
+      <rect x="584" y="248" width="82" height="44" rx="3" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="625" y="268" text-anchor="middle" fill="#88a8d8" font-size="8">Fluent Bit</text>
+      <text x="625" y="281" text-anchor="middle" fill="#5a7a96" font-size="7.5">log shipping</text>
+      <!-- OTel row -->
+      <rect x="396" y="302" width="270" height="44" rx="3" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="531" y="322" text-anchor="middle" fill="#88a8d8" font-size="8">OTel Collector → metrics · logs · traces</text>
+      <text x="531" y="336" text-anchor="middle" fill="#5a7a96" font-size="7.5">CloudWatch / Azure Monitor / Jaeger / Tempo / X-Ray / App Insights</text>
+      <!-- ArgoCD -->
+      <rect x="396" y="356" width="270" height="38" rx="3" fill="#0b1628" stroke="#c0ec00" stroke-width="1"/>
+      <text x="531" y="373" text-anchor="middle" fill="#d4ff00" font-size="8">ArgoCD GitOps — sync from GitHub / GitLab repo</text>
+      <text x="531" y="386" text-anchor="middle" fill="#5a7a96" font-size="7.5">Helm charts · App of Apps · image tag auto-update via Argo Image Updater</text>
+
+      <!-- Cloud services panel -->
+      <rect x="692" y="28" width="314" height="380" rx="6" fill="rgba(255,39,173,.025)" stroke="#ff27ad" stroke-width="1" stroke-dasharray="4 2"/>
+      <text x="707" y="44" fill="#ff8fd6" font-size="8.5">MANAGED CLOUD SERVICES</text>
+
+      <!-- AWS column -->
+      <text x="745" y="62" text-anchor="middle" fill="#ff9900" font-size="8" font-weight="bold">AWS</text>
+      <rect x="700" y="70" width="90" height="36" rx="3" fill="#0b1628" stroke="#ff9900" stroke-width="1"/>
+      <text x="745" y="85" text-anchor="middle" fill="#ff9900" font-size="7.5">RDS (Postgres)</text>
+      <text x="745" y="98" text-anchor="middle" fill="#5a7a96" font-size="7">Multi-AZ · encrypted</text>
+      <rect x="700" y="116" width="90" height="36" rx="3" fill="#0b1628" stroke="#ff9900" stroke-width="1"/>
+      <text x="745" y="131" text-anchor="middle" fill="#ff9900" font-size="7.5">ElastiCache (Redis)</text>
+      <text x="745" y="144" text-anchor="middle" fill="#5a7a96" font-size="7">cluster mode</text>
+      <rect x="700" y="162" width="90" height="36" rx="3" fill="#0b1628" stroke="#ff9900" stroke-width="1"/>
+      <text x="745" y="177" text-anchor="middle" fill="#ff9900" font-size="7.5">S3 (Object Store)</text>
+      <text x="745" y="190" text-anchor="middle" fill="#5a7a96" font-size="7">versioned · encrypted</text>
+      <rect x="700" y="208" width="90" height="36" rx="3" fill="#0b1628" stroke="#ff9900" stroke-width="1"/>
+      <text x="745" y="223" text-anchor="middle" fill="#ff9900" font-size="7.5">SQS (Queue)</text>
+      <text x="745" y="236" text-anchor="middle" fill="#5a7a96" font-size="7">dead-letter queue</text>
+      <rect x="700" y="254" width="90" height="36" rx="3" fill="#0b1628" stroke="#ff9900" stroke-width="1"/>
+      <text x="745" y="269" text-anchor="middle" fill="#ff9900" font-size="7.5">Secrets Manager</text>
+      <text x="745" y="282" text-anchor="middle" fill="#5a7a96" font-size="7">auto-rotate</text>
+      <rect x="700" y="300" width="90" height="36" rx="3" fill="#0b1628" stroke="#ff9900" stroke-width="1"/>
+      <text x="745" y="315" text-anchor="middle" fill="#ff9900" font-size="7.5">IAM + IRSA</text>
+      <text x="745" y="328" text-anchor="middle" fill="#5a7a96" font-size="7">pod workload identity</text>
+      <rect x="700" y="346" width="90" height="36" rx="3" fill="#0b1628" stroke="#ff9900" stroke-width="1"/>
+      <text x="745" y="361" text-anchor="middle" fill="#ff9900" font-size="7.5">ECR + Inspector</text>
+      <text x="745" y="374" text-anchor="middle" fill="#5a7a96" font-size="7">auto-scan on push</text>
+
+      <!-- Azure column -->
+      <text x="880" y="62" text-anchor="middle" fill="#0078d4" font-size="8" font-weight="bold">AZURE</text>
+      <rect x="834" y="70" width="160" height="36" rx="3" fill="#0b1628" stroke="#0078d4" stroke-width="1"/>
+      <text x="914" y="85" text-anchor="middle" fill="#0078d4" font-size="7.5">Azure Database (Postgres)</text>
+      <text x="914" y="98" text-anchor="middle" fill="#5a7a96" font-size="7">zone-redundant · CMK</text>
+      <rect x="834" y="116" width="160" height="36" rx="3" fill="#0b1628" stroke="#0078d4" stroke-width="1"/>
+      <text x="914" y="131" text-anchor="middle" fill="#0078d4" font-size="7.5">Azure Cache for Redis</text>
+      <text x="914" y="144" text-anchor="middle" fill="#5a7a96" font-size="7">enterprise tier</text>
+      <rect x="834" y="162" width="160" height="36" rx="3" fill="#0b1628" stroke="#0078d4" stroke-width="1"/>
+      <text x="914" y="177" text-anchor="middle" fill="#0078d4" font-size="7.5">Azure Blob Storage</text>
+      <text x="914" y="190" text-anchor="middle" fill="#5a7a96" font-size="7">immutable + versioned</text>
+      <rect x="834" y="208" width="160" height="36" rx="3" fill="#0b1628" stroke="#0078d4" stroke-width="1"/>
+      <text x="914" y="223" text-anchor="middle" fill="#0078d4" font-size="7.5">Azure Service Bus</text>
+      <text x="914" y="236" text-anchor="middle" fill="#5a7a96" font-size="7">topics + subscriptions</text>
+      <rect x="834" y="254" width="160" height="36" rx="3" fill="#0b1628" stroke="#0078d4" stroke-width="1"/>
+      <text x="914" y="269" text-anchor="middle" fill="#0078d4" font-size="7.5">Azure Key Vault</text>
+      <text x="914" y="282" text-anchor="middle" fill="#5a7a96" font-size="7">managed HSM · rotate</text>
+      <rect x="834" y="300" width="160" height="36" rx="3" fill="#0b1628" stroke="#0078d4" stroke-width="1"/>
+      <text x="914" y="315" text-anchor="middle" fill="#0078d4" font-size="7.5">Entra ID + Workload ID</text>
+      <text x="914" y="328" text-anchor="middle" fill="#5a7a96" font-size="7">federated pod identity</text>
+      <rect x="834" y="346" width="160" height="36" rx="3" fill="#0b1628" stroke="#0078d4" stroke-width="1"/>
+      <text x="914" y="361" text-anchor="middle" fill="#0078d4" font-size="7.5">ACR + Defender</text>
+      <text x="914" y="374" text-anchor="middle" fill="#5a7a96" font-size="7">vulnerability assessment</text>
+    </svg>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="card cg p-4 text-sm">
+      <h3 class="font-display font-bold mb-3" style="color:#00c896">☸ EKS / AKS Configuration</h3>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Managed Node Groups (EKS) / Node Pools (AKS); OS hardened to CIS Level 2</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Workload Identity: IRSA (AWS) or Azure Workload Identity — per-pod least-privilege cloud access; no static creds</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Namespaces: <code>prod</code> / <code>staging</code> / <code>monitoring</code> / <code>security</code> / <code>argocd</code></span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Pod Security Admission: Restricted policy cluster-wide; Kyverno for registry allow-list + image signing</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Calico CNI network policies: default-deny; allow-list per service</span></div>
+    </div>
+    <div class="card cb p-4 text-sm">
+      <h3 class="font-display font-bold mb-3" style="color:#3a6ec0">📦 Container Standards</h3>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>Distroless or Alpine base images; non-root user; read-only root filesystem</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>Multi-stage Dockerfiles; BuildKit cache mounts for Maven / npm / Cargo</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>Images pushed to ECR (AWS) or ACR (Azure) via OIDC from GitHub Actions / GitLab CI</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>Cosign keyless image signing (OIDC); Kyverno policy blocks unsigned images in prod</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>SBOM (CycloneDX / Syft) attached to OCI image as attestation; SLSA Level 3 provenance</span></div>
+    </div>
+    <div class="card cp p-4 text-sm">
+      <h3 class="font-display font-bold mb-3" style="color:#ff27ad">💰 Cost Optimization</h3>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Spot (AWS) / Spot VMs (Azure) for stateless workloads — 60-70% node cost savings</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Karpenter (AWS) / KEDA for event-driven right-sized node provisioning</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Graviton3 ARM64 (AWS) / Ampere Arm64 (Azure): 20-40% price/performance improvement</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Kubecost per-namespace chargeback; Compute Optimizer / Azure Advisor AI rightsizing</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Dev/staging auto-scale-to-zero off-hours; Reserved Instances / Savings Plans via ML guidance</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ROLES ══════════════════════ -->
+<div id="tab-roles" class="tab-pane">
+  <div class="mb-5">
+    <span class="badge" style="background:rgba(192,236,0,.1);border:1px solid rgba(192,236,0,.4);color:#c0ec00">ROLES &amp; ACCESS</span>
+    <h2 class="text-3xl font-display font-bold mt-1" style="color:#e8f4ff">RBAC, CBAC &amp; Zero Trust Access</h2>
+  </div>
+
+  <!-- DIAGRAM: Access flow -->
+  <div class="card p-4 mb-5 overflow-x-auto" style="position:relative;border:1px solid rgba(192,236,0,.3)">
+    <div class="fl" style="color:#c0ec00;border-color:#c0ec00">ZERO TRUST ACCESS FLOW — IDENTITY → IDP → K8S RBAC → CLOUD IAM → RESOURCES</div>
+    <svg viewBox="0 0 1000 290" width="100%" style="min-width:680px;margin-top:14px" font-family="'Share Tech Mono',monospace" font-size="10">
+      <defs>
+        <marker id="ra" markerWidth="6" markerHeight="6" refX="4" refY="2.5" orient="auto"><path d="M0,0 L0,5 L6,2.5 Z" fill="#c0ec00"/></marker>
+      </defs>
+
+      <!-- Identities -->
+      <text x="60" y="16" text-anchor="middle" fill="#c0ec00" font-size="8.5" letter-spacing="1">IDENTITY</text>
+      <rect x="10" y="22" width="100" height="34" rx="4" fill="#0b1628" stroke="#00c896" stroke-width="1"/><text x="60" y="37" text-anchor="middle" fill="#7dffd8" font-size="9">DevSecOps</text><text x="60" y="50" text-anchor="middle" fill="#5a7a96" font-size="7.5">full pipeline</text>
+      <rect x="10" y="66" width="100" height="34" rx="4" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/><text x="60" y="81" text-anchor="middle" fill="#88a8d8" font-size="9">App Developer</text><text x="60" y="94" text-anchor="middle" fill="#5a7a96" font-size="7.5">build · test</text>
+      <rect x="10" y="110" width="100" height="34" rx="4" fill="#0b1628" stroke="#ff27ad" stroke-width="1"/><text x="60" y="125" text-anchor="middle" fill="#ff8fd6" font-size="9">App Manager</text><text x="60" y="138" text-anchor="middle" fill="#5a7a96" font-size="7.5">approve · audit</text>
+      <rect x="10" y="154" width="100" height="34" rx="4" fill="#0b1628" stroke="#c0ec00" stroke-width="1"/><text x="60" y="169" text-anchor="middle" fill="#d4ff00" font-size="9">End User</text><text x="60" y="182" text-anchor="middle" fill="#5a7a96" font-size="7.5">app only</text>
+      <rect x="10" y="198" width="100" height="34" rx="4" fill="#0b1628" stroke="#88a8d8" stroke-width="1"/><text x="60" y="213" text-anchor="middle" fill="#c8dde8" font-size="9">CI/CD Bot</text><text x="60" y="226" text-anchor="middle" fill="#5a7a96" font-size="7.5">OIDC · scoped</text>
+
+      <!-- Arrows to IdP -->
+      <path d="M110,39 L165,105" stroke="#00c896" stroke-width="1" marker-end="url(#ra)" opacity=".7"/>
+      <path d="M110,83 L165,118" stroke="#3a6ec0" stroke-width="1" marker-end="url(#ra)" opacity=".7"/>
+      <path d="M110,127 L165,132" stroke="#ff27ad" stroke-width="1" marker-end="url(#ra)" opacity=".7"/>
+      <path d="M110,171 L165,150" stroke="#c0ec00" stroke-width="1" marker-end="url(#ra)" opacity=".7"/>
+      <path d="M110,215 L165,168" stroke="#88a8d8" stroke-width="1" marker-end="url(#ra)" opacity=".7"/>
+
+      <!-- IdP -->
+      <text x="234" y="16" text-anchor="middle" fill="#c0ec00" font-size="8.5" letter-spacing="1">IDENTITY PROVIDER</text>
+      <rect x="165" y="22" width="138" height="230" rx="5" fill="rgba(192,236,0,.04)" stroke="rgba(192,236,0,.25)" stroke-width="1"/>
+      <text x="234" y="50" text-anchor="middle" fill="#d4ff00" font-size="9" font-weight="bold">Okta / Azure AD</text>
+      <text x="234" y="65" text-anchor="middle" fill="#5a7a96" font-size="8">SAML 2.0 / OIDC SSO</text>
+      <text x="234" y="80" text-anchor="middle" fill="#5a7a96" font-size="8">MFA enforced</text>
+      <text x="234" y="95" text-anchor="middle" fill="#5a7a96" font-size="8">GitHub SSO (teams)</text>
+      <text x="234" y="110" text-anchor="middle" fill="#5a7a96" font-size="8">GitLab group sync</text>
+      <line x1="180" y1="122" x2="292" y2="122" stroke="rgba(192,236,0,.2)" stroke-width="1"/>
+      <text x="234" y="140" text-anchor="middle" fill="#d4ff00" font-size="9" font-weight="bold">CBAC Context</text>
+      <text x="234" y="156" text-anchor="middle" fill="#5a7a96" font-size="7.5">Time window</text>
+      <text x="234" y="170" text-anchor="middle" fill="#5a7a96" font-size="7.5">Network / VPN</text>
+      <text x="234" y="184" text-anchor="middle" fill="#5a7a96" font-size="7.5">MFA step-up</text>
+      <text x="234" y="198" text-anchor="middle" fill="#5a7a96" font-size="7.5">Device posture</text>
+      <text x="234" y="212" text-anchor="middle" fill="#5a7a96" font-size="7.5">Geo-fence</text>
+      <text x="234" y="226" text-anchor="middle" fill="#5a7a96" font-size="7.5">SCP / Azure Policy</text>
+
+      <path d="M303,137 L322,137" stroke="#c0ec00" stroke-width="1.5" marker-end="url(#ra)"/>
+
+      <!-- K8s RBAC -->
+      <text x="405" y="16" text-anchor="middle" fill="#c0ec00" font-size="8.5" letter-spacing="1">K8S RBAC</text>
+      <rect x="322" y="22" width="166" height="230" rx="5" fill="rgba(58,110,192,.04)" stroke="rgba(58,110,192,.25)" stroke-width="1"/>
+      <text x="405" y="50" text-anchor="middle" fill="#88a8d8" font-size="9" font-weight="bold">ClusterRole Bindings</text>
+      <rect x="332" y="58" width="146" height="28" rx="3" fill="#0b1628" stroke="#00c896" stroke-width="1"/>
+      <text x="405" y="73" text-anchor="middle" fill="#7dffd8" font-size="8">DevSecOps → cluster-admin</text>
+      <text x="405" y="84" text-anchor="middle" fill="#5a7a96" font-size="7">(scoped namespaces)</text>
+      <rect x="332" y="98" width="146" height="28" rx="3" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="405" y="113" text-anchor="middle" fill="#88a8d8" font-size="8">Developer → dev-role</text>
+      <text x="405" y="124" text-anchor="middle" fill="#5a7a96" font-size="7">view pods/logs · exec</text>
+      <rect x="332" y="138" width="146" height="28" rx="3" fill="#0b1628" stroke="#ff27ad" stroke-width="1"/>
+      <text x="405" y="153" text-anchor="middle" fill="#ff8fd6" font-size="8">Manager → ns-viewer</text>
+      <text x="405" y="164" text-anchor="middle" fill="#5a7a96" font-size="7">read-only all ns</text>
+      <rect x="332" y="178" width="146" height="28" rx="3" fill="#0b1628" stroke="#88a8d8" stroke-width="1"/>
+      <text x="405" y="193" text-anchor="middle" fill="#c8dde8" font-size="8">CI Bot → deployer-role</text>
+      <text x="405" y="204" text-anchor="middle" fill="#5a7a96" font-size="7">create/update deploy</text>
+      <rect x="332" y="218" width="146" height="26" rx="3" fill="rgba(255,39,173,.08)" stroke="#ff27ad" stroke-width="1"/>
+      <text x="405" y="235" text-anchor="middle" fill="#ff8fd6" font-size="7.5">End User → no K8s access</text>
+
+      <path d="M488,137 L508,137" stroke="#c0ec00" stroke-width="1.5" marker-end="url(#ra)"/>
+
+      <!-- Cloud IAM -->
+      <text x="610" y="16" text-anchor="middle" fill="#c0ec00" font-size="8.5" letter-spacing="1">CLOUD IAM (AWS / AZURE)</text>
+      <rect x="508" y="22" width="206" height="230" rx="5" fill="rgba(255,39,173,.03)" stroke="rgba(255,39,173,.22)" stroke-width="1"/>
+      <text x="611" y="46" text-anchor="middle" fill="#ff8fd6" font-size="9" font-weight="bold">Least-Privilege Policies</text>
+      <text x="611" y="62" text-anchor="middle" fill="#5a7a96" font-size="7.5">AWS IAM Policies · Azure RBAC Roles</text>
+      <rect x="518" y="70" width="186" height="26" rx="3" fill="#0b1628" stroke="#00c896" stroke-width="1"/>
+      <text x="611" y="87" text-anchor="middle" fill="#7dffd8" font-size="7.5">DevSecOps: PowerUser + SecurityAudit</text>
+      <rect x="518" y="104" width="186" height="26" rx="3" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="611" y="121" text-anchor="middle" fill="#88a8d8" font-size="7.5">Developer: ECR/ACR push · read secrets</text>
+      <rect x="518" y="138" width="186" height="26" rx="3" fill="#0b1628" stroke="#ff27ad" stroke-width="1"/>
+      <text x="611" y="155" text-anchor="middle" fill="#ff8fd6" font-size="7.5">Manager: ReadOnly + Cost view</text>
+      <rect x="518" y="172" width="186" height="26" rx="3" fill="#0b1628" stroke="#88a8d8" stroke-width="1"/>
+      <text x="611" y="189" text-anchor="middle" fill="#c8dde8" font-size="7.5">CI Bot: OIDC → IRSA / Workload ID</text>
+      <rect x="518" y="206" width="186" height="38" rx="3" fill="rgba(192,236,0,.06)" stroke="rgba(192,236,0,.3)" stroke-width="1"/>
+      <text x="611" y="224" text-anchor="middle" fill="#d4ff00" font-size="8">SCPs (AWS) / Azure Policy</text>
+      <text x="611" y="237" text-anchor="middle" fill="#5a7a96" font-size="7">org-level guardrails · deny public storage</text>
+
+      <path d="M714,137 L734,137" stroke="#c0ec00" stroke-width="1.5" marker-end="url(#ra)"/>
+
+      <!-- Resources -->
+      <text x="858" y="16" text-anchor="middle" fill="#c0ec00" font-size="8.5" letter-spacing="1">RESOURCES</text>
+      <rect x="734" y="22" width="256" height="230" rx="5" fill="rgba(0,200,150,.03)" stroke="rgba(0,200,150,.22)" stroke-width="1"/>
+      <rect x="744" y="34" width="110" height="30" rx="3" fill="#0b1628" stroke="#00c896" stroke-width="1"/><text x="799" y="53" text-anchor="middle" fill="#7dffd8" font-size="8">K8s Cluster</text>
+      <rect x="868" y="34" width="110" height="30" rx="3" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/><text x="923" y="53" text-anchor="middle" fill="#88a8d8" font-size="8">GitHub / GitLab</text>
+      <rect x="744" y="74" width="110" height="30" rx="3" fill="#0b1628" stroke="#ff27ad" stroke-width="1"/><text x="799" y="93" text-anchor="middle" fill="#ff8fd6" font-size="8">Secrets Vault</text>
+      <rect x="868" y="74" width="110" height="30" rx="3" fill="#0b1628" stroke="#ff9900" stroke-width="1"/><text x="923" y="93" text-anchor="middle" fill="#ff9900" font-size="8">ECR / ACR</text>
+      <rect x="744" y="114" width="110" height="30" rx="3" fill="#0b1628" stroke="#0078d4" stroke-width="1"/><text x="799" y="133" text-anchor="middle" fill="#0078d4" font-size="8">S3 / Blob Storage</text>
+      <rect x="868" y="114" width="110" height="30" rx="3" fill="#0b1628" stroke="#88a8d8" stroke-width="1"/><text x="923" y="133" text-anchor="middle" fill="#c8dde8" font-size="8">Databases</text>
+      <rect x="744" y="154" width="234" height="30" rx="3" fill="#0b1628" stroke="#ffb400" stroke-width="1"/><text x="861" y="173" text-anchor="middle" fill="#ffb400" font-size="8">Monitoring · Dashboards · Logs</text>
+      <rect x="744" y="194" width="234" height="50" rx="3" fill="rgba(0,200,150,.06)" stroke="#00c896" stroke-width="1"/>
+      <text x="861" y="215" text-anchor="middle" fill="#7dffd8" font-size="8">All Access → Audit Log</text>
+      <text x="861" y="230" text-anchor="middle" fill="#5a7a96" font-size="7.5">CloudTrail (AWS) / Azure Activity Log</text>
+      <text x="861" y="242" text-anchor="middle" fill="#5a7a96" font-size="7.5">every API call recorded · SIEM alerts</text>
+    </svg>
+  </div>
+
+  <div class="card p-4 mb-4">
+    <h3 class="font-display font-bold text-sm mb-3" style="color:#c0ec00">📋 RBAC Matrix</h3>
+    <div class="rt">
+      <table>
+        <thead><tr><th>ROLE</th><th>K8s ClusterRole</th><th>Cloud IAM (AWS / Azure)</th><th>CI/CD (GitHub / GitLab)</th><th>Secrets</th><th>Prod Deploy</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#00c896;font-weight:600">DevSecOps</td><td>cluster-admin (ns scoped)</td><td>PowerUser + SecurityAudit</td><td>Full pipeline config</td><td>Read/Write (vault)</td><td>✅ Auto + Manual</td></tr>
+          <tr><td style="color:#3a6ec0;font-weight:600">App Developer</td><td>developer (view/logs)</td><td>Developer (ECR/ACR push)</td><td>Build · test trigger</td><td>Read (dev only)</td><td>❌ PR only</td></tr>
+          <tr><td style="color:#ff27ad;font-weight:600">App Manager</td><td>namespace-viewer</td><td>ReadOnly + Cost view</td><td>Approve gate</td><td>Read (audit)</td><td>✅ Approval gate</td></tr>
+          <tr><td style="color:#c0ec00;font-weight:600">Security Auditor</td><td>security-viewer (all ns)</td><td>SecurityAudit + Config</td><td>View logs only</td><td>No access</td><td>❌ Observe only</td></tr>
+          <tr><td style="color:#88a8d8;font-weight:600">End User</td><td>N/A</td><td>App-level (Cognito / Entra)</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
+          <tr><td style="color:#ff9f70;font-weight:600">CI/CD Bot</td><td>deployer (prod ns)</td><td>OIDC IRSA / Workload Identity</td><td>Automated full run</td><td>Read (workload ID)</td><td>✅ Automated only</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ SECURITY ══════════════════════ -->
+<div id="tab-security" class="tab-pane">
+  <div class="mb-5">
+    <span class="badge" style="background:rgba(255,39,173,.1);border:1px solid rgba(255,39,173,.4);color:#ff27ad">🔐 ZERO TRUST</span>
+    <h2 class="text-3xl font-display font-bold mt-1" style="color:#e8f4ff">Security Architecture — Defense in Depth</h2>
+  </div>
+
+  <!-- DIAGRAM: Concentric security layers -->
+  <div class="card p-4 mb-5 overflow-x-auto glow-p" style="position:relative">
+    <div class="fl" style="color:#ff27ad;border-color:#ff27ad">DEFENSE IN DEPTH — 5-LAYER SECURITY MODEL</div>
+    <svg viewBox="0 0 980 330" width="100%" style="min-width:640px;margin-top:14px" font-family="'Share Tech Mono',monospace" font-size="10">
+      <!-- L5 edge -->
+      <rect x="8" y="8" width="964" height="314" rx="10" fill="rgba(255,39,173,.04)" stroke="#ff27ad" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text x="22" y="25" fill="#ff8fd6" font-size="8.5" letter-spacing="1">L5 EDGE — WAF (AWS WAFv2 / Azure Front Door WAF) · CDN (CloudFront / Azure CDN) · DDoS (Shield / Azure DDoS Plan) · Bot protection</text>
+      <!-- L4 network -->
+      <rect x="24" y="32" width="932" height="278" rx="8" fill="rgba(58,110,192,.04)" stroke="#3a6ec0" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text x="38" y="48" fill="#3a6ec0" font-size="8.5" letter-spacing="1">L4 NETWORK — VPC / VNet · Private Subnets · Security Groups · NACLs · VPC Endpoints / Private Endpoints · PrivateLink</text>
+      <!-- L3 identity -->
+      <rect x="40" y="56" width="900" height="252" rx="8" fill="rgba(192,236,0,.03)" stroke="#c0ec00" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text x="54" y="72" fill="#c0ec00" font-size="8.5" letter-spacing="1">L3 IDENTITY — SSO (Okta/Azure AD) · MFA · RBAC/CBAC · IRSA/Workload ID · Zero Trust (Verified Access / Entra Private Access)</text>
+      <!-- L2 app -->
+      <rect x="56" y="80" width="868" height="220" rx="8" fill="rgba(0,200,150,.03)" stroke="#00c896" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text x="70" y="96" fill="#00c896" font-size="8.5" letter-spacing="1">L2 APP / K8S — Pod Security · Network Policies · Istio mTLS · Kyverno · Image Signing · SAST/DAST · OPA</text>
+      <!-- L1 data -->
+      <rect x="72" y="104" width="836" height="188" rx="8" fill="rgba(255,180,0,.03)" stroke="#ffb400" stroke-width="1.5"/>
+      <text x="86" y="120" fill="#ffb400" font-size="8.5" letter-spacing="1">L1 DATA — KMS / Key Vault encryption · TLS 1.3 in transit · Secrets Manager / Key Vault · Macie / Purview PII scan · WORM audit logs</text>
+
+      <!-- inner security controls -->
+      <rect x="88" y="130" width="118" height="56" rx="4" fill="#0b1628" stroke="#ff27ad" stroke-width="1"/>
+      <text x="147" y="152" text-anchor="middle" fill="#ff8fd6" font-size="8.5" font-weight="bold">GuardDuty</text>
+      <text x="147" y="166" text-anchor="middle" fill="#5a7a96" font-size="7.5">/ Defender</text>
+      <text x="147" y="178" text-anchor="middle" fill="#5a7a96" font-size="7">ML threat detect</text>
+
+      <rect x="218" y="130" width="118" height="56" rx="4" fill="#0b1628" stroke="#c0ec00" stroke-width="1"/>
+      <text x="277" y="150" text-anchor="middle" fill="#d4ff00" font-size="8.5" font-weight="bold">Sec Hub /</text>
+      <text x="277" y="163" text-anchor="middle" fill="#d4ff00" font-size="8">Defender CSPM</text>
+      <text x="277" y="178" text-anchor="middle" fill="#5a7a96" font-size="7">posture management</text>
+
+      <rect x="348" y="130" width="118" height="56" rx="4" fill="#0b1628" stroke="#00c896" stroke-width="1"/>
+      <text x="407" y="150" text-anchor="middle" fill="#7dffd8" font-size="8.5" font-weight="bold">cert-manager</text>
+      <text x="407" y="163" text-anchor="middle" fill="#5a7a96" font-size="7.5">Let's Encrypt / ACM</text>
+      <text x="407" y="178" text-anchor="middle" fill="#5a7a96" font-size="7">auto-rotate TLS certs</text>
+
+      <rect x="478" y="130" width="118" height="56" rx="4" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="537" y="150" text-anchor="middle" fill="#88a8d8" font-size="8.5" font-weight="bold">SIEM</text>
+      <text x="537" y="163" text-anchor="middle" fill="#5a7a96" font-size="7.5">Splunk / Sentinel</text>
+      <text x="537" y="178" text-anchor="middle" fill="#5a7a96" font-size="7">SOAR playbooks</text>
+
+      <rect x="608" y="130" width="118" height="56" rx="4" fill="#0b1628" stroke="#ff9f70" stroke-width="1"/>
+      <text x="667" y="150" text-anchor="middle" fill="#ff9f70" font-size="8.5" font-weight="bold">Secret Scan</text>
+      <text x="667" y="163" text-anchor="middle" fill="#5a7a96" font-size="7.5">Gitleaks · GHASS</text>
+      <text x="667" y="178" text-anchor="middle" fill="#5a7a96" font-size="7">pre-commit + CI/CD</text>
+
+      <rect x="738" y="130" width="158" height="56" rx="4" fill="#0b1628" stroke="#ffb400" stroke-width="1"/>
+      <text x="817" y="150" text-anchor="middle" fill="#ffb400" font-size="8.5" font-weight="bold">SBOM + SCA</text>
+      <text x="817" y="163" text-anchor="middle" fill="#5a7a96" font-size="7.5">Syft · Snyk · Grype · Trivy</text>
+      <text x="817" y="178" text-anchor="middle" fill="#5a7a96" font-size="7">supply-chain security</text>
+
+      <!-- bottom row -->
+      <rect x="88" y="198" width="196" height="44" rx="4" fill="#0b1628" stroke="#ff27ad" stroke-width="1"/>
+      <text x="186" y="217" text-anchor="middle" fill="#ff8fd6" font-size="8">DAST — OWASP ZAP / Burp</text>
+      <text x="186" y="232" text-anchor="middle" fill="#5a7a96" font-size="7.5">auth scan · API fuzzing per PR</text>
+
+      <rect x="294" y="198" width="196" height="44" rx="4" fill="#0b1628" stroke="#00c896" stroke-width="1"/>
+      <text x="392" y="217" text-anchor="middle" fill="#7dffd8" font-size="8">Image Scan — Inspector / Trivy</text>
+      <text x="392" y="232" text-anchor="middle" fill="#5a7a96" font-size="7.5">ECR/ACR scan on every push</text>
+
+      <rect x="500" y="198" width="196" height="44" rx="4" fill="#0b1628" stroke="#c0ec00" stroke-width="1"/>
+      <text x="598" y="217" text-anchor="middle" fill="#d4ff00" font-size="8">Config / Policy — AWS Config / Azure Policy</text>
+      <text x="598" y="232" text-anchor="middle" fill="#5a7a96" font-size="7.5">continuous compliance · auto-remediation</text>
+
+      <rect x="706" y="198" width="190" height="44" rx="4" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="801" y="217" text-anchor="middle" fill="#88a8d8" font-size="8">Chaos Engineering</text>
+      <text x="801" y="232" text-anchor="middle" fill="#5a7a96" font-size="7.5">Chaos Mesh · Gremlin fault injection</text>
+
+      <!-- AI label -->
+      <rect x="88" y="254" width="808" height="30" rx="4" fill="rgba(255,39,173,.05)" stroke="rgba(255,39,173,.2)" stroke-width="1"/>
+      <text x="492" y="274" text-anchor="middle" fill="#ff8fd6" font-size="8">🤖 AI — GuardDuty/Defender ML threat detect · UEBA anomaly · WAF auto-tune · LLM threat model · AI-driven SOAR runbooks</text>
+    </svg>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card cp p-4 text-sm">
+      <h3 class="font-display font-bold mb-2" style="color:#ff27ad">🌐 Network Security</h3>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>VPC (AWS) / VNet (Azure) — public · private · data subnet tiers; no direct internet to workloads</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>WAF: AWS WAFv2 / Azure Front Door WAF — OWASP managed rule groups, rate limiting, IP reputation lists</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>DDoS: AWS Shield Advanced / Azure DDoS Protection Plan — automated mitigation &lt;1 minute</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Private connectivity: VPC Endpoints / Private Endpoints — cloud service traffic never traverses public internet</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>GuardDuty (AWS) / Microsoft Defender for Cloud: ML threat detection on CloudTrail, DNS, VPC Flow Logs</span></div>
+    </div>
+    <div class="card cg p-4 text-sm">
+      <h3 class="font-display font-bold mb-2" style="color:#00c896">🔑 Identity &amp; Zero Trust</h3>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>SSO: Okta / Azure AD / Entra ID — SAML + OIDC federation including GitHub and GitLab org SSO</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Workload Identity: IRSA (AWS) / Azure Workload Identity Federation — no static credentials in pods or CI runners</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Istio mTLS: auto-rotated certificates between every microservice; mutual auth enforced</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Zero Trust Network Access: AWS Verified Access / Azure Private Access — device-posture checked; no VPN needed</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Audit trail: CloudTrail (AWS) / Azure Activity Log — every API call logged; forwarded to SIEM</span></div>
+    </div>
+    <div class="card cy p-4 text-sm">
+      <h3 class="font-display font-bold mb-2" style="color:#c0ec00">🔒 Data Security</h3>
+      <div class="bi"><div class="dot" style="background:#c0ec00"></div><span>Encryption at rest: KMS (AWS) / Azure Key Vault CMKs on all data stores (RDS, Blob, EBS, Queue)</span></div>
+      <div class="bi"><div class="dot" style="background:#c0ec00"></div><span>Encryption in transit: TLS 1.3 enforced everywhere; policy-enforced via Config rules / Azure Policy</span></div>
+      <div class="bi"><div class="dot" style="background:#c0ec00"></div><span>Secrets rotation: Secrets Manager (AWS) / Key Vault (Azure) with automatic rotation; External Secrets Operator injects to K8s</span></div>
+      <div class="bi"><div class="dot" style="background:#c0ec00"></div><span>PII detection: Amazon Macie / Microsoft Purview — auto-scan object storage for sensitive data leaks</span></div>
+      <div class="bi"><div class="dot" style="background:#c0ec00"></div><span>Immutable audit logs: S3 Object Lock / Azure Immutable Blob Storage (WORM) for compliance artifacts</span></div>
+    </div>
+    <div class="card cb p-4 text-sm">
+      <h3 class="font-display font-bold mb-2" style="color:#3a6ec0">📋 Compliance &amp; Governance</h3>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>Security Hub / Defender CSPM: CIS benchmark, Foundational Security Standard automated checks — real-time posture score</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>AWS Config / Azure Policy: continuous compliance; auto-remediation Lambda / Azure Automation Runbook for violations</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>SCPs (AWS) / Azure Policy at org level: deny public storage, enforce encryption, restrict to approved regions</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>SOC 2 Type II, GDPR, HIPAA controls mapped; evidence auto-collected from cloud audit APIs quarterly</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>Annual pen test + quarterly vulnerability scanning; SLAs: Critical P1 patch in 24h, High within 7 days</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ MONITOR ══════════════════════ -->
+<div id="tab-monitor" class="tab-pane">
+  <div class="mb-5">
+    <span class="badge" style="background:rgba(58,110,192,.1);border:1px solid rgba(58,110,192,.4);color:#3a6ec0">📊 OBSERVABILITY</span>
+    <h2 class="text-3xl font-display font-bold mt-1" style="color:#e8f4ff">Monitoring Stack — Web · Mobile · Desktop · Cloud</h2>
+  </div>
+
+  <!-- DIAGRAM: Observability topology -->
+  <div class="card p-4 mb-5 overflow-x-auto glow-b" style="position:relative">
+    <div class="fl" style="color:#3a6ec0;border-color:#3a6ec0">OBSERVABILITY TOPOLOGY — SOURCES → OTEL → BACKENDS → ACTIONS</div>
+    <svg viewBox="0 0 980 310" width="100%" style="min-width:720px;margin-top:14px" font-family="'Share Tech Mono',monospace" font-size="10">
+      <defs>
+        <marker id="ma" markerWidth="6" markerHeight="6" refX="4" refY="2.5" orient="auto"><path d="M0,0 L0,5 L6,2.5 Z" fill="#3a6ec0"/></marker>
+        <marker id="mg" markerWidth="6" markerHeight="6" refX="4" refY="2.5" orient="auto"><path d="M0,0 L0,5 L6,2.5 Z" fill="#00c896"/></marker>
+      </defs>
+
+      <!-- Sources -->
+      <text x="78" y="16" text-anchor="middle" fill="#8aaec4" font-size="8.5" letter-spacing="1">TELEMETRY SOURCES</text>
+      <rect x="10" y="24" width="136" height="34" rx="4" fill="#0b1628" stroke="#61dafb" stroke-width="1"/>
+      <text x="78" y="40" text-anchor="middle" fill="#61dafb" font-size="8">🌐 React Web App</text>
+      <text x="78" y="52" text-anchor="middle" fill="#5a7a96" font-size="7.5">Core Web Vitals · RUM · Sentry</text>
+
+      <rect x="10" y="68" width="136" height="34" rx="4" fill="#0b1628" stroke="#00add8" stroke-width="1"/>
+      <text x="78" y="84" text-anchor="middle" fill="#00add8" font-size="8">📱 React Native Mobile</text>
+      <text x="78" y="96" text-anchor="middle" fill="#5a7a96" font-size="7.5">Crashlytics · Device Farm · OTel</text>
+
+      <rect x="10" y="112" width="136" height="34" rx="4" fill="#0b1628" stroke="#dea584" stroke-width="1"/>
+      <text x="78" y="128" text-anchor="middle" fill="#dea584" font-size="8">🖥 Electron Desktop</text>
+      <text x="78" y="140" text-anchor="middle" fill="#5a7a96" font-size="7.5">Sentry · custom OTLP</text>
+
+      <rect x="10" y="156" width="136" height="34" rx="4" fill="#0b1628" stroke="#f89820" stroke-width="1"/>
+      <text x="78" y="172" text-anchor="middle" fill="#f89820" font-size="8">☕ Java Spring API</text>
+      <text x="78" y="184" text-anchor="middle" fill="#5a7a96" font-size="7.5">Micrometer · OTel SDK</text>
+
+      <rect x="10" y="200" width="136" height="34" rx="4" fill="#0b1628" stroke="#00c896" stroke-width="1"/>
+      <text x="78" y="216" text-anchor="middle" fill="#7dffd8" font-size="8">🐹 Go / ⚙️ Rust svcs</text>
+      <text x="78" y="228" text-anchor="middle" fill="#5a7a96" font-size="7.5">OTel SDK · Prometheus</text>
+
+      <rect x="10" y="244" width="136" height="34" rx="4" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="78" y="260" text-anchor="middle" fill="#88a8d8" font-size="8">☸ K8s nodes/pods</text>
+      <text x="78" y="272" text-anchor="middle" fill="#5a7a96" font-size="7.5">kube-state · node-exporter</text>
+
+      <!-- Arrows to OTel -->
+      <path d="M146,41 L222,130" stroke="#3a6ec0" stroke-width="1" marker-end="url(#ma)" stroke-dasharray="3 2"/>
+      <path d="M146,85 L222,143" stroke="#3a6ec0" stroke-width="1" marker-end="url(#ma)" stroke-dasharray="3 2"/>
+      <path d="M146,129 L222,155" stroke="#3a6ec0" stroke-width="1" marker-end="url(#ma)" stroke-dasharray="3 2"/>
+      <path d="M146,173 L222,165" stroke="#3a6ec0" stroke-width="1" marker-end="url(#ma)" stroke-dasharray="3 2"/>
+      <path d="M146,217 L222,175" stroke="#3a6ec0" stroke-width="1" marker-end="url(#ma)" stroke-dasharray="3 2"/>
+      <path d="M146,261 L222,188" stroke="#3a6ec0" stroke-width="1" marker-end="url(#ma)" stroke-dasharray="3 2"/>
+
+      <!-- OTel Collector -->
+      <rect x="222" y="112" width="128" height="88" rx="6" fill="#0b1628" stroke="#00c896" stroke-width="2"/>
+      <text x="286" y="142" text-anchor="middle" fill="#7dffd8" font-size="9" font-weight="bold">OTel</text>
+      <text x="286" y="157" text-anchor="middle" fill="#7dffd8" font-size="9" font-weight="bold">Collector</text>
+      <text x="286" y="172" text-anchor="middle" fill="#5a7a96" font-size="7.5">metrics · logs · traces</text>
+      <text x="286" y="186" text-anchor="middle" fill="#5a7a96" font-size="7.5">fan-out to backends</text>
+
+      <path d="M350,140 L398,82" stroke="#00c896" stroke-width="1.5" marker-end="url(#mg)"/>
+      <path d="M350,155 L398,158" stroke="#00c896" stroke-width="1.5" marker-end="url(#mg)"/>
+      <path d="M350,170 L398,236" stroke="#00c896" stroke-width="1.5" marker-end="url(#mg)"/>
+
+      <!-- Metrics -->
+      <rect x="398" y="50" width="148" height="66" rx="5" fill="#0b1628" stroke="#00c896" stroke-width="1.5"/>
+      <text x="472" y="72" text-anchor="middle" fill="#7dffd8" font-size="9" font-weight="bold">📈 METRICS</text>
+      <text x="472" y="88" text-anchor="middle" fill="#5a7a96" font-size="7.5">Prometheus + Grafana</text>
+      <text x="472" y="101" text-anchor="middle" fill="#ff9900" font-size="7.5">CloudWatch (AWS)</text>
+      <text x="472" y="114" text-anchor="middle" fill="#0078d4" font-size="7.5">Azure Monitor</text>
+
+      <!-- Logs -->
+      <rect x="398" y="128" width="148" height="66" rx="5" fill="#0b1628" stroke="#3a6ec0" stroke-width="1.5"/>
+      <text x="472" y="150" text-anchor="middle" fill="#88a8d8" font-size="9" font-weight="bold">📋 LOGS</text>
+      <text x="472" y="166" text-anchor="middle" fill="#5a7a96" font-size="7.5">OpenSearch / ELK</text>
+      <text x="472" y="179" text-anchor="middle" fill="#ff9900" font-size="7.5">CloudWatch Logs (AWS)</text>
+      <text x="472" y="192" text-anchor="middle" fill="#0078d4" font-size="7.5">Log Analytics (Azure)</text>
+
+      <!-- Traces -->
+      <rect x="398" y="208" width="148" height="66" rx="5" fill="#0b1628" stroke="#ff27ad" stroke-width="1.5"/>
+      <text x="472" y="230" text-anchor="middle" fill="#ff8fd6" font-size="9" font-weight="bold">🔍 TRACES</text>
+      <text x="472" y="246" text-anchor="middle" fill="#5a7a96" font-size="7.5">Jaeger / Tempo</text>
+      <text x="472" y="259" text-anchor="middle" fill="#ff9900" font-size="7.5">X-Ray (AWS)</text>
+      <text x="472" y="272" text-anchor="middle" fill="#0078d4" font-size="7.5">Application Insights (Azure)</text>
+
+      <!-- Arrows to alert/dash/aiops -->
+      <path d="M546,83 L598,120" stroke="#00c896" stroke-width="1.5" marker-end="url(#mg)"/>
+      <path d="M546,161 L598,161" stroke="#3a6ec0" stroke-width="1.5" marker-end="url(#ma)"/>
+      <path d="M546,241 L598,202" stroke="#ff27ad" stroke-width="1.5" marker-end="url(#ma)"/>
+
+      <!-- Alerting -->
+      <rect x="598" y="70" width="148" height="66" rx="5" fill="#0b1628" stroke="#ffb400" stroke-width="1.5"/>
+      <text x="672" y="92" text-anchor="middle" fill="#ffb400" font-size="9" font-weight="bold">🔔 ALERTING</text>
+      <text x="672" y="108" text-anchor="middle" fill="#5a7a96" font-size="7.5">Alertmanager</text>
+      <text x="672" y="121" text-anchor="middle" fill="#5a7a96" font-size="7.5">PagerDuty · OpsGenie</text>
+
+      <!-- Dashboards -->
+      <rect x="598" y="148" width="148" height="66" rx="5" fill="#0b1628" stroke="#c0ec00" stroke-width="1.5"/>
+      <text x="672" y="170" text-anchor="middle" fill="#d4ff00" font-size="9" font-weight="bold">📊 DASHBOARDS</text>
+      <text x="672" y="186" text-anchor="middle" fill="#5a7a96" font-size="7.5">Grafana · Kibana</text>
+      <text x="672" y="199" text-anchor="middle" fill="#5a7a96" font-size="7.5">SLO · SLA · DORA</text>
+
+      <!-- AIOps -->
+      <rect x="598" y="226" width="148" height="66" rx="5" fill="#0b1628" stroke="#ff27ad" stroke-width="1.5"/>
+      <text x="672" y="248" text-anchor="middle" fill="#ff8fd6" font-size="9" font-weight="bold">🤖 AIOps</text>
+      <text x="672" y="264" text-anchor="middle" fill="#5a7a96" font-size="7.5">DevOps Guru / Dynatrace</text>
+      <text x="672" y="277" text-anchor="middle" fill="#5a7a96" font-size="7.5">anomaly · RCA · dedup</text>
+
+      <!-- Outputs -->
+      <path d="M746,103 L808,103" stroke="#ffb400" stroke-width="1.5" marker-end="url(#mg)"/>
+      <path d="M746,181 L808,181" stroke="#c0ec00" stroke-width="1.5" marker-end="url(#mg)"/>
+      <path d="M746,259 L808,259" stroke="#ff27ad" stroke-width="1.5" marker-end="url(#mg)"/>
+
+      <rect x="808" y="76" width="162" height="54" rx="5" fill="#0b1628" stroke="#ffb400" stroke-width="1"/>
+      <text x="889" y="99" text-anchor="middle" fill="#ffb400" font-size="8.5">On-call Engineer</text>
+      <text x="889" y="113" text-anchor="middle" fill="#5a7a96" font-size="7.5">Slack · PagerDuty</text>
+
+      <rect x="808" y="154" width="162" height="54" rx="5" fill="#0b1628" stroke="#c0ec00" stroke-width="1"/>
+      <text x="889" y="177" text-anchor="middle" fill="#d4ff00" font-size="8.5">Team Dashboards</text>
+      <text x="889" y="191" text-anchor="middle" fill="#5a7a96" font-size="7.5">Grafana shared views</text>
+
+      <rect x="808" y="232" width="162" height="54" rx="5" fill="#0b1628" stroke="#ff27ad" stroke-width="1"/>
+      <text x="889" y="255" text-anchor="middle" fill="#ff8fd6" font-size="8.5">ChatOps Bot (Slack)</text>
+      <text x="889" y="269" text-anchor="middle" fill="#5a7a96" font-size="7.5">"why is prod slow?" → AI RCA</text>
+    </svg>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="card cg p-4 text-sm"><h3 class="font-display font-bold mb-2" style="color:#00c896">🌐 Web</h3>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Core Web Vitals via CloudWatch RUM (AWS) / Azure App Insights RUM</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Synthetic canary checks (Playwright headless) every 5 min from multiple regions</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>Sentry.io error tracking with source maps; React error boundaries</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span>API P50/P95/P99 latency per endpoint; SLO burn-rate alerting</span></div>
+    </div>
+    <div class="card cb p-4 text-sm"><h3 class="font-display font-bold mb-2" style="color:#3a6ec0">📱 Mobile</h3>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>Firebase Crashlytics for iOS + Android real-time crash/ANR reporting</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>Real device testing: Device Farm (AWS) / App Center (Azure) — 50+ device matrix</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>OTel mobile SDK: network call traces, UI interaction spans, app startup time</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>Push delivery success rate tracked; notification funnel analytics</span></div>
+    </div>
+    <div class="card cp p-4 text-sm"><h3 class="font-display font-bold mb-2" style="color:#ff27ad">🖥 Desktop</h3>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Electron / Tauri: Sentry SDK for crash + performance with session replay</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Custom OTLP exporter to central OTel Collector; memory/CPU alerting</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Auto-update adoption tracking: version rollout % per platform (Win/Mac/Linux)</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Crash-free sessions rate as primary desktop health KPI</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ AI ══════════════════════ -->
+<div id="tab-ai" class="tab-pane">
+  <div class="mb-5">
+    <span class="badge" style="background:rgba(255,39,173,.1);border:1px solid rgba(255,39,173,.4);color:#ff27ad">🤖 AI AUGMENTATION</span>
+    <h2 class="text-3xl font-display font-bold mt-1 tgp" style="color:#e8f4ff">AI / ML Enhancements Across the Platform</h2>
+  </div>
+
+  <!-- DIAGRAM: AI touchpoints -->
+  <div class="card p-4 mb-5 overflow-x-auto" style="position:relative;border:1px solid rgba(255,39,173,.35)">
+    <div class="fl" style="color:#ff27ad;border-color:#ff27ad">AI INTEGRATION TOUCHPOINTS — GITHUB ACTIONS / GITLAB CI PIPELINE</div>
+    <svg viewBox="0 0 980 195" width="100%" style="min-width:700px;margin-top:14px" font-family="'Share Tech Mono',monospace" font-size="10">
+      <line x1="28" y1="80" x2="952" y2="80" stroke="#1a3050" stroke-width="2"/>
+      <line x1="28" y1="80" x2="952" y2="80" stroke="#ff27ad" stroke-width="1.5" stroke-dasharray="6 3" class="fa" opacity=".6"/>
+      <text x="490" y="16" text-anchor="middle" fill="#ff27ad" font-size="9" letter-spacing="2">🤖  AI / ML ACTIVE AT EVERY STAGE — GitHub Actions / GitLab CI</text>
+
+      <!-- stages with callouts -->
+      <g><circle cx="56" cy="80" r="20" fill="#0b1628" stroke="#ff27ad" stroke-width="1.5"/><text x="56" y="76" text-anchor="middle" font-size="18">📐</text><text x="56" y="88" text-anchor="middle" fill="#5a7a96" font-size="7">Plan</text>
+        <rect x="14" y="110" width="86" height="70" rx="3" fill="rgba(255,39,173,.06)" stroke="rgba(255,39,173,.25)" stroke-width="1"/>
+        <text x="57" y="126" text-anchor="middle" fill="#ff8fd6" font-size="7.5">Story gen</text><text x="57" y="139" text-anchor="middle" fill="#5a7a96" font-size="7">wireframe assist</text><text x="57" y="152" text-anchor="middle" fill="#5a7a96" font-size="7">threat model</text><text x="57" y="165" text-anchor="middle" fill="#5a7a96" font-size="7">OpenAPI draft</text>
+      </g>
+      <g><circle cx="172" cy="80" r="20" fill="#0b1628" stroke="#00c896" stroke-width="1.5"/><text x="172" y="76" text-anchor="middle" font-size="18">💻</text><text x="172" y="88" text-anchor="middle" fill="#5a7a96" font-size="7">Code</text>
+        <rect x="130" y="110" width="86" height="70" rx="3" fill="rgba(0,200,150,.05)" stroke="rgba(0,200,150,.2)" stroke-width="1"/>
+        <text x="173" y="126" text-anchor="middle" fill="#7dffd8" font-size="7.5">Copilot / Q Dev</text><text x="173" y="139" text-anchor="middle" fill="#5a7a96" font-size="7">Cursor IDE chat</text><text x="173" y="152" text-anchor="middle" fill="#5a7a96" font-size="7">inline sec check</text><text x="173" y="165" text-anchor="middle" fill="#5a7a96" font-size="7">doc generation</text>
+      </g>
+      <g><circle cx="290" cy="80" r="20" fill="#0b1628" stroke="#3a6ec0" stroke-width="1.5"/><text x="290" y="76" text-anchor="middle" font-size="18">🔀</text><text x="290" y="88" text-anchor="middle" fill="#5a7a96" font-size="7">Review</text>
+        <rect x="248" y="110" width="86" height="70" rx="3" fill="rgba(58,110,192,.05)" stroke="rgba(58,110,192,.2)" stroke-width="1"/>
+        <text x="291" y="126" text-anchor="middle" fill="#88a8d8" font-size="7.5">CodeRabbit</text><text x="291" y="139" text-anchor="middle" fill="#5a7a96" font-size="7">PR/MR summary</text><text x="291" y="152" text-anchor="middle" fill="#5a7a96" font-size="7">security explain</text><text x="291" y="165" text-anchor="middle" fill="#5a7a96" font-size="7">1-click fix suggest</text>
+      </g>
+      <g><circle cx="410" cy="80" r="20" fill="#0b1628" stroke="#ff9f70" stroke-width="1.5"/><text x="410" y="76" text-anchor="middle" font-size="18">🔨</text><text x="410" y="88" text-anchor="middle" fill="#5a7a96" font-size="7">Build</text>
+        <rect x="368" y="110" width="86" height="70" rx="3" fill="rgba(255,159,112,.05)" stroke="rgba(255,159,112,.2)" stroke-width="1"/>
+        <text x="411" y="126" text-anchor="middle" fill="#ff9f70" font-size="7.5">smart test select</text><text x="411" y="139" text-anchor="middle" fill="#5a7a96" font-size="7">fail prediction</text><text x="411" y="152" text-anchor="middle" fill="#5a7a96" font-size="7">CVE triage</text><text x="411" y="165" text-anchor="middle" fill="#5a7a96" font-size="7">SBOM delta explain</text>
+      </g>
+      <g><circle cx="532" cy="80" r="20" fill="#0b1628" stroke="#c0ec00" stroke-width="2"/><text x="532" y="76" text-anchor="middle" font-size="18">🧪</text><text x="532" y="88" text-anchor="middle" fill="#5a7a96" font-size="7">Test</text>
+        <rect x="490" y="110" width="86" height="70" rx="3" fill="rgba(192,236,0,.05)" stroke="rgba(192,236,0,.2)" stroke-width="1"/>
+        <text x="533" y="126" text-anchor="middle" fill="#d4ff00" font-size="7.5">test generation</text><text x="533" y="139" text-anchor="middle" fill="#5a7a96" font-size="7">flaky detect</text><text x="533" y="152" text-anchor="middle" fill="#5a7a96" font-size="7">edge cases</text><text x="533" y="165" text-anchor="middle" fill="#5a7a96" font-size="7">API fuzzing</text>
+      </g>
+      <g><circle cx="654" cy="80" r="20" fill="#0b1628" stroke="#ff27ad" stroke-width="1.5"/><text x="654" y="76" text-anchor="middle" font-size="18">🎭</text><text x="654" y="88" text-anchor="middle" fill="#5a7a96" font-size="7">Stage</text>
+        <rect x="612" y="110" width="86" height="70" rx="3" fill="rgba(255,39,173,.05)" stroke="rgba(255,39,173,.2)" stroke-width="1"/>
+        <text x="655" y="126" text-anchor="middle" fill="#ff8fd6" font-size="7.5">risk 0–100 score</text><text x="655" y="139" text-anchor="middle" fill="#5a7a96" font-size="7">regression ML</text><text x="655" y="152" text-anchor="middle" fill="#5a7a96" font-size="7">approval brief</text><text x="655" y="165" text-anchor="middle" fill="#5a7a96" font-size="7">UAT scenario gen</text>
+      </g>
+      <g><circle cx="778" cy="80" r="24" fill="#0b1628" stroke="#00c896" stroke-width="2.5"/><text x="778" y="74" text-anchor="middle" font-size="20">🚀</text><text x="778" y="90" text-anchor="middle" fill="#5a7a96" font-size="7">Prod</text>
+        <rect x="736" y="114" width="86" height="70" rx="3" fill="rgba(0,200,150,.06)" stroke="rgba(0,200,150,.25)" stroke-width="1"/>
+        <text x="779" y="130" text-anchor="middle" fill="#7dffd8" font-size="7.5">canary analysis</text><text x="779" y="143" text-anchor="middle" fill="#5a7a96" font-size="7">auto-rollback</text><text x="779" y="156" text-anchor="middle" fill="#5a7a96" font-size="7">timing predict</text><text x="779" y="169" text-anchor="middle" fill="#5a7a96" font-size="7">pre-scale</text>
+      </g>
+      <g><circle cx="928" cy="80" r="20" fill="#0b1628" stroke="#88a8d8" stroke-width="1.5"/><text x="928" y="76" text-anchor="middle" font-size="18">📊</text><text x="928" y="88" text-anchor="middle" fill="#5a7a96" font-size="7">Monitor</text>
+        <rect x="886" y="110" width="86" height="70" rx="3" fill="rgba(136,168,216,.05)" stroke="rgba(136,168,216,.2)" stroke-width="1"/>
+        <text x="929" y="126" text-anchor="middle" fill="#c8dde8" font-size="7.5">AIOps RCA</text><text x="929" y="139" text-anchor="middle" fill="#5a7a96" font-size="7">alert dedup</text><text x="929" y="152" text-anchor="middle" fill="#5a7a96" font-size="7">post-mortem LLM</text><text x="929" y="165" text-anchor="middle" fill="#5a7a96" font-size="7">ChatOps Q&amp;A</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card cp p-4 text-sm" style="background:linear-gradient(135deg,#0b1628,#16081a)">
+      <h3 class="font-display font-bold mb-3" style="color:#ff8fd6">🧠 AI in GitHub Actions / GitLab CI</h3>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span><strong style="color:#ff8fd6">CodeRabbit:</strong> AI posts line-level PR/MR comments on bugs, security, and style; generates plain-language summary</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span><strong style="color:#ff8fd6">Copilot / Q Dev:</strong> Auto-generates unit tests for new functions; inline multi-line completions in VS Code / IntelliJ</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span><strong style="color:#ff8fd6">Smart Test Select:</strong> ML model predicts which test suites are affected by the diff — 50-60% CI runtime saved</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span><strong style="color:#ff8fd6">Vuln Prioritization:</strong> AI ranks SAST/SCA findings by real exploitability in your stack — not raw CVSS score</span></div>
+      <div class="bi"><div class="dot" style="background:#ff27ad"></div><span><strong style="color:#ff8fd6">One-Click Fix:</strong> LLM proposes inline code fix for SAST issues directly in GitHub / GitLab diff view</span></div>
+    </div>
+    <div class="card cg p-4 text-sm" style="background:linear-gradient(135deg,#0b1628,#071a14)">
+      <h3 class="font-display font-bold mb-3" style="color:#7dffd8">🔐 AI in Security (AWS / Azure)</h3>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">GuardDuty / Defender:</strong> ML detects crypto-mining, lateral movement, unusual API call patterns in real time</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">UEBA:</strong> ML baselines per-user behavior; deviation triggers MFA step-up or account hold</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">Threat Modeling:</strong> LLM analyzes architecture + PR diffs; auto-generates STRIDE threat list for review</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">WAF Tuning:</strong> ML analyzes WAF logs; suggests false-positive reductions and new block rules automatically</span></div>
+      <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">IR Automation:</strong> AI-driven SOAR (Bedrock / Azure OpenAI agent) takes initial containment steps on critical findings</span></div>
+    </div>
+    <div class="card cb p-4 text-sm" style="background:linear-gradient(135deg,#0b1628,#080f1f)">
+      <h3 class="font-display font-bold mb-3" style="color:#88a8d8">📊 AIOps — Monitoring &amp; Operations</h3>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span><strong style="color:#88a8d8">DevOps Guru / Dynatrace:</strong> ML baselines each service; detects pre-incident signals hours before user impact</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span><strong style="color:#88a8d8">Alert Dedup:</strong> AI clusters 50 correlated alerts into one incident with clear context — on-call fatigue eliminated</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span><strong style="color:#88a8d8">RCA:</strong> AI correlates metrics + traces + logs; 30-second Slack summary of root cause and blast radius</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span><strong style="color:#88a8d8">Auto-Rollback:</strong> Argo Rollouts + Kayenta ML validates canary; rolls back autonomously on anomaly detection</span></div>
+      <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span><strong style="color:#88a8d8">ChatOps:</strong> Slack LLM bot — "what's wrong with prod?" pulls observability context and responds in plain English</span></div>
+    </div>
+    <div class="card cy p-4 text-sm" style="background:linear-gradient(135deg,#0b1628,#0d1408)">
+      <h3 class="font-display font-bold mb-3" style="color:#d4ff00">💰 AI in Cost Optimization</h3>
+      <div class="bi"><div class="dot" style="background:#c0ec00"></div><span><strong style="color:#d4ff00">Rightsizing:</strong> Compute Optimizer (AWS) / Azure Advisor ML recommends optimal instance types from utilization data</span></div>
+      <div class="bi"><div class="dot" style="background:#c0ec00"></div><span><strong style="color:#d4ff00">Spot Prediction:</strong> ML predicts Spot / Preemptible interruptions; pre-migrates workloads before eviction window</span></div>
+      <div class="bi"><div class="dot" style="background:#c0ec00"></div><span><strong style="color:#d4ff00">Cost Anomaly:</strong> Cost Anomaly Detection (AWS) / Azure Cost Alerts ML flags unexpected spend spikes within hours</span></div>
+      <div class="bi"><div class="dot" style="background:#c0ec00"></div><span><strong style="color:#d4ff00">Savings Plan Guidance:</strong> ML analyzes 90-day usage; recommends Reserved Instance / Savings Plan mix for each service</span></div>
+      <div class="bi"><div class="dot" style="background:#c0ec00"></div><span><strong style="color:#d4ff00">Developer Productivity:</strong> Copilot saves ~35% coding time; AI test gen reduces QA time by ~60%; both measurable in DORA</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ STACKS ══════════════════════ -->
+<div id="tab-stacks" class="tab-pane">
+  <div class="mb-5">
+    <span class="badge" style="background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.4);color:#00c896">💻 TECH STACKS</span>
+    <h2 class="text-3xl font-display font-bold mt-1" style="color:#e8f4ff">Application Technology Stacks</h2>
+  </div>
+
+  <!-- DIAGRAM: Stack → Container → Registry → Cloud -->
+  <div class="card p-4 mb-5 overflow-x-auto glow-g" style="position:relative">
+    <div class="fl">STACK → BUILD (GitHub Actions / GitLab CI) → REGISTRY → CLOUD DEPLOY</div>
+    <svg viewBox="0 0 980 210" width="100%" style="min-width:640px;margin-top:14px" font-family="'Share Tech Mono',monospace" font-size="10">
+      <defs>
+        <marker id="sa" markerWidth="6" markerHeight="6" refX="4" refY="2.5" orient="auto"><path d="M0,0 L0,5 L6,2.5 Z" fill="#00c896"/></marker>
+      </defs>
+
+      <!-- App stacks -->
+      <text x="175" y="16" text-anchor="middle" fill="#8aaec4" font-size="8.5" letter-spacing="1">APP STACKS</text>
+      <rect x="10" y="24" width="80" height="64" rx="4" fill="#0b1628" stroke="#f89820" stroke-width="1.5"/>
+      <text x="50" y="54" text-anchor="middle" font-size="22">☕</text><text x="50" y="76" text-anchor="middle" fill="#f89820" font-size="8">Java Spring</text>
+      <rect x="104" y="24" width="80" height="64" rx="4" fill="#0b1628" stroke="#61dafb" stroke-width="1.5"/>
+      <text x="144" y="54" text-anchor="middle" font-size="22">⚛️</text><text x="144" y="76" text-anchor="middle" fill="#61dafb" font-size="8">React/Next.js</text>
+      <rect x="198" y="24" width="80" height="64" rx="4" fill="#0b1628" stroke="#00add8" stroke-width="1.5"/>
+      <text x="238" y="54" text-anchor="middle" font-size="22">🐹</text><text x="238" y="76" text-anchor="middle" fill="#00add8" font-size="8">Golang</text>
+      <rect x="292" y="24" width="80" height="64" rx="4" fill="#0b1628" stroke="#dea584" stroke-width="1.5"/>
+      <text x="332" y="54" text-anchor="middle" font-size="22">⚙️</text><text x="332" y="76" text-anchor="middle" fill="#dea584" font-size="8">Rust</text>
+
+      <path d="M372,56 L412,56" stroke="#00c896" stroke-width="1.5" marker-end="url(#sa)"/>
+
+      <!-- CI/CD + Container -->
+      <text x="490" y="16" text-anchor="middle" fill="#8aaec4" font-size="8.5" letter-spacing="1">CI BUILD (GITHUB ACTIONS / GITLAB CI)</text>
+      <rect x="412" y="20" width="156" height="130" rx="5" fill="rgba(0,200,150,.04)" stroke="#00c896" stroke-width="1"/>
+      <text x="490" y="40" text-anchor="middle" fill="#7dffd8" font-size="8.5" font-weight="bold">Multi-Stage Dockerfile</text>
+      <text x="490" y="56" text-anchor="middle" fill="#5a7a96" font-size="7.5">distroless / alpine base</text>
+      <text x="490" y="70" text-anchor="middle" fill="#5a7a96" font-size="7.5">non-root user enforced</text>
+      <text x="490" y="84" text-anchor="middle" fill="#5a7a96" font-size="7.5">BuildKit cache mounts</text>
+      <text x="490" y="98" text-anchor="middle" fill="#5a7a96" font-size="7.5">Cosign signed (OIDC)</text>
+      <text x="490" y="112" text-anchor="middle" fill="#5a7a96" font-size="7.5">SBOM via Syft/CycloneDX</text>
+      <text x="490" y="126" text-anchor="middle" fill="#c0ec00" font-size="7.5">GitHub Actions / GitLab CI</text>
+      <text x="490" y="140" text-anchor="middle" fill="#5a7a96" font-size="7.5">linux/amd64 + linux/arm64</text>
+
+      <path d="M568,85 L608,85" stroke="#00c896" stroke-width="1.5" marker-end="url(#sa)"/>
+
+      <!-- Registry -->
+      <text x="682" y="16" text-anchor="middle" fill="#8aaec4" font-size="8.5" letter-spacing="1">CONTAINER REGISTRY</text>
+      <rect x="608" y="36" width="148" height="98" rx="5" fill="#0b1628" stroke="#3a6ec0" stroke-width="1.5"/>
+      <text x="682" y="72" text-anchor="middle" fill="#ff9900" font-size="11">▲</text>
+      <text x="682" y="88" text-anchor="middle" fill="#ff9900" font-size="8.5" font-weight="bold">ECR (AWS)</text>
+      <text x="682" y="102" text-anchor="middle" fill="#5a7a96" font-size="7.5">Inspector auto-scan</text>
+      <line x1="618" y1="112" x2="748" y2="112" stroke="#1a3050" stroke-width="1"/>
+      <text x="682" y="126" text-anchor="middle" fill="#0078d4" font-size="8.5" font-weight="bold">ACR (Azure)</text>
+
+      <path d="M756,85 L796,85" stroke="#3a6ec0" stroke-width="1.5" marker-end="url(#sa)"/>
+
+      <!-- Cloud deploy -->
+      <text x="878" y="16" text-anchor="middle" fill="#8aaec4" font-size="8.5" letter-spacing="1">CLOUD DEPLOY</text>
+      <rect x="796" y="20" width="176" height="148" rx="5" fill="rgba(0,200,150,.04)" stroke="#00c896" stroke-width="1.5"/>
+      <text x="884" y="44" text-anchor="middle" fill="#ff9900" font-size="9" font-weight="bold">AWS EKS</text>
+      <text x="884" y="58" text-anchor="middle" fill="#5a7a96" font-size="7.5">Managed Node Groups</text>
+      <text x="884" y="71" text-anchor="middle" fill="#5a7a96" font-size="7.5">Fargate (serverless pods)</text>
+      <text x="884" y="84" text-anchor="middle" fill="#5a7a96" font-size="7.5">Karpenter autoscaler</text>
+      <line x1="806" y1="96" x2="964" y2="96" stroke="#1a3050" stroke-width="1"/>
+      <text x="884" y="114" text-anchor="middle" fill="#0078d4" font-size="9" font-weight="bold">AZURE AKS</text>
+      <text x="884" y="128" text-anchor="middle" fill="#5a7a96" font-size="7.5">Node Pools + Virtual Nodes</text>
+      <text x="884" y="141" text-anchor="middle" fill="#5a7a96" font-size="7.5">KEDA event-driven scale</text>
+      <text x="884" y="154" text-anchor="middle" fill="#5a7a96" font-size="7.5">Azure CNI Overlay</text>
+
+      <!-- IaC bar -->
+      <text x="490" y="175" text-anchor="middle" fill="#8aaec4" font-size="8.5" letter-spacing="1">INFRASTRUCTURE AS CODE</text>
+      <rect x="10" y="183" width="130" height="18" rx="3" fill="#0b1628" stroke="#7b42bc" stroke-width="1"/>
+      <text x="75" y="196" text-anchor="middle" fill="#9d7fcc" font-size="8">Terraform / Terragrunt</text>
+      <rect x="150" y="183" width="130" height="18" rx="3" fill="#0b1628" stroke="#ff8c00" stroke-width="1"/>
+      <text x="215" y="196" text-anchor="middle" fill="#ff9f30" font-size="8">AWS CDK / Azure Bicep</text>
+      <rect x="290" y="183" width="115" height="18" rx="3" fill="#0b1628" stroke="#326ce5" stroke-width="1"/>
+      <text x="347" y="196" text-anchor="middle" fill="#88a8d8" font-size="8">Helm · ArgoCD · Flux</text>
+      <rect x="415" y="183" width="120" height="18" rx="3" fill="#0b1628" stroke="#3a6ec0" stroke-width="1"/>
+      <text x="475" y="196" text-anchor="middle" fill="#88a8d8" font-size="8">Ansible · Packer AMI/VHD</text>
+      <rect x="545" y="183" width="120" height="18" rx="3" fill="#0b1628" stroke="#00c896" stroke-width="1"/>
+      <text x="605" y="196" text-anchor="middle" fill="#7dffd8" font-size="8">tfsec · Checkov · cdk-nag</text>
+      <rect x="675" y="183" width="130" height="18" rx="3" fill="#0b1628" stroke="#c0ec00" stroke-width="1"/>
+      <text x="740" y="196" text-anchor="middle" fill="#d4ff00" font-size="8">OPA · Kyverno</text>
+      <rect x="815" y="183" width="155" height="18" rx="3" fill="#0b1628" stroke="#ff27ad" stroke-width="1"/>
+      <text x="892" y="196" text-anchor="middle" fill="#ff8fd6" font-size="8">GitHub Actions / GitLab CI deploy</text>
+    </svg>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card p-4" style="border-left:3px solid #f89820">
+      <div class="flex items-center gap-2 mb-3"><span class="text-2xl">☕</span><div><h3 class="font-display font-bold text-base" style="color:#f89820">Java Spring Boot</h3><span style="color:#8aaec4;font-size:12px">REST / gRPC microservices</span></div></div>
+      <div class="space-y-0 text-sm">
+        <div class="bi"><div class="dot" style="background:#f89820"></div><span>Spring Boot 3.x + Spring Security; OAuth2/JWT; Spring Cloud for config / service discovery</span></div>
+        <div class="bi"><div class="dot" style="background:#f89820"></div><span>GraalVM Native Image for fast startup (Fargate / Lambda); Micrometer + OTel SDK for observability</span></div>
+        <div class="bi"><div class="dot" style="background:#f89820"></div><span>Distroless JRE 21 base; <code>-XX:MaxRAMPercentage=75</code>; Testcontainers for integration tests</span></div>
+        <div class="bi"><div class="dot" style="background:#f89820"></div><span>Maven / Gradle in GitHub Actions or GitLab CI; OWASP Dependency-Check + Snyk SCA gate</span></div>
+      </div>
+    </div>
+    <div class="card p-4" style="border-left:3px solid #61dafb">
+      <div class="flex items-center gap-2 mb-3"><span class="text-2xl">⚛️</span><div><h3 class="font-display font-bold text-base" style="color:#61dafb">React JS / Next.js</h3><span style="color:#8aaec4;font-size:12px">Web SPA · SSR · React Native Mobile</span></div></div>
+      <div class="space-y-0 text-sm">
+        <div class="bi"><div class="dot" style="background:#61dafb"></div><span>React 18 + TypeScript; Next.js SSR/ISR for SEO; React Native for iOS + Android shared codebase</span></div>
+        <div class="bi"><div class="dot" style="background:#61dafb"></div><span>Nginx Alpine container; static assets on CDN (CloudFront / Azure CDN) for global &lt;50ms delivery</span></div>
+        <div class="bi"><div class="dot" style="background:#61dafb"></div><span>Playwright E2E + Vitest unit; npm audit + Snyk in GitHub Actions / GitLab CI pipeline</span></div>
+        <div class="bi"><div class="dot" style="background:#61dafb"></div><span>CSP headers; XSS via DOMPurify; env vars at runtime from K8s Secret / Key Vault — never baked in image</span></div>
+      </div>
+    </div>
+    <div class="card p-4" style="border-left:3px solid #00add8">
+      <div class="flex items-center gap-2 mb-3"><span class="text-2xl">🐹</span><div><h3 class="font-display font-bold text-base" style="color:#00add8">Golang</h3><span style="color:#8aaec4;font-size:12px">High-throughput services · K8s operators</span></div></div>
+      <div class="space-y-0 text-sm">
+        <div class="bi"><div class="dot" style="background:#00add8"></div><span>Go 1.22+; static binary in <code>FROM scratch</code> (~8 MB); chi/gin for HTTP; buf + protoc for gRPC</span></div>
+        <div class="bi"><div class="dot" style="background:#00add8"></div><span>govulncheck + golangci-lint + <code>go test -race</code> in CI; goreleaser multi-arch linux/amd64 + arm64</span></div>
+        <div class="bi"><div class="dot" style="background:#00add8"></div><span>controller-runtime for K8s operators; context propagation + OTel tracing throughout</span></div>
+      </div>
+    </div>
+    <div class="card p-4" style="border-left:3px solid #dea584">
+      <div class="flex items-center gap-2 mb-3"><span class="text-2xl">⚙️</span><div><h3 class="font-display font-bold text-base" style="color:#dea584">Rust</h3><span style="color:#8aaec4;font-size:12px">High-performance · WASM · Security tools</span></div></div>
+      <div class="space-y-0 text-sm">
+        <div class="bi"><div class="dot" style="background:#dea584"></div><span>Rust stable; Axum / Actix-web async HTTP; Tokio runtime — memory-safe, zero data races by design</span></div>
+        <div class="bi"><div class="dot" style="background:#dea584"></div><span>cargo audit + cargo deny + Clippy in CI; musl cross-compile → truly static distroless container</span></div>
+        <div class="bi"><div class="dot" style="background:#dea584"></div><span>Compiled to WASM for browser-side crypto or Cloudflare Workers edge processing</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ APP DEV LIFECYCLE ══════════════════════ -->
+<div id="tab-appdev" class="tab-pane">
+  <div class="mb-5">
+    <span class="badge" style="background:rgba(255,180,0,.1);border:1px solid rgba(255,180,0,.45);color:#ffb400">🧑‍💻 APP DEV LIFECYCLE</span>
+    <h2 class="text-3xl font-display font-bold mt-1" style="color:#e8f4ff">Application Development Lifecycle</h2>
+    <p style="color:#8aaec4">Code → Review → Build → Test → Stage → Gate → Prod → Monitor — with AI at every step, deploying to AWS or Azure</p>
+  </div>
+
+  <!-- DIAGRAM: Full lifecycle SVG -->
+  <div class="card p-4 mb-6 overflow-x-auto" style="position:relative;border:1px solid rgba(255,180,0,.35);box-shadow:0 0 22px rgba(255,180,0,.1)">
+    <div class="fl" style="color:#ffb400;border-color:#ffb400">APP LIFECYCLE — GITHUB / GITLAB → ECR/ACR → EKS/AKS (AWS OR AZURE)</div>
+    <svg viewBox="0 0 1080 225" width="100%" style="min-width:800px;margin-top:14px" font-family="'Share Tech Mono',monospace" font-size="10">
+      <defs>
+        <marker id="lcy" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 Z" fill="#ffb400"/></marker>
+        <marker id="lcg" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 Z" fill="#00c896"/></marker>
+        <linearGradient id="lcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#ffb400" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="#00c896" stop-opacity=".5"/>
+        </linearGradient>
+        <filter id="gf2"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- Cloud destination banner top-right -->
+      <rect x="820" y="4" width="254" height="18" rx="3" fill="rgba(0,200,150,.06)" stroke="rgba(0,200,150,.2)" stroke-width="1"/>
+      <text x="947" y="16" text-anchor="middle" fill="#7dffd8" font-size="8">DEPLOYS TO: EKS (AWS) or AKS (Azure) via ArgoCD</text>
+
+      <rect x="8" y="52" width="1060" height="100" rx="7" fill="rgba(255,180,0,.025)" stroke="rgba(255,180,0,.1)" stroke-width="1"/>
+      <line x1="50" y1="102" x2="1024" y2="102" stroke="#1a3050" stroke-width="1.5"/>
+      <line x1="50" y1="102" x2="1024" y2="102" stroke="url(#lcGrad)" stroke-width="1.5" class="fa" opacity=".6"/>
+
+      <!-- AI strip -->
+      <rect x="8" y="158" width="1060" height="52" rx="4" fill="rgba(255,39,173,.04)" stroke="rgba(255,39,173,.16)" stroke-width="1" stroke-dasharray="4 3"/>
+      <text x="22" y="189" fill="#ff8fd6" font-size="8.5">🤖  AI LAYER — Copilot/Q Dev · CodeRabbit · Semgrep AI · Diffblue · RESTler · Kayenta / Argo Rollouts ML · DevOps Guru / Dynatrace · ChatOps Bot · AIOps RCA</text>
+
+      <!-- Phase boxes -->
+      <!-- 1 Plan -->
+      <g transform="translate(10,60)"><rect width="82" height="84" rx="5" fill="#0b1628" stroke="#ffb400" stroke-width="1.5" filter="url(#gf2)"/>
+        <text x="41" y="28" text-anchor="middle" font-size="22">📐</text>
+        <text x="41" y="48" text-anchor="middle" fill="#ffb400" font-size="9" font-weight="bold">PLAN</text>
+        <text x="41" y="62" text-anchor="middle" fill="#5a7a96" font-size="7.5">Jira · Linear</text>
+        <text x="41" y="75" text-anchor="middle" fill="#5a7a96" font-size="7.5">Figma · ADR</text>
+        <text x="41" y="102" text-anchor="middle" fill="#ff8fd6" font-size="7">AI: story/design gen</text>
+      </g>
+      <path d="M92,102 L108,102" stroke="#ffb400" stroke-width="1.5" marker-end="url(#lcy)"/>
+
+      <!-- 2 Code -->
+      <g transform="translate(110,60)"><rect width="82" height="84" rx="5" fill="#0b1628" stroke="#00c896" stroke-width="1.5" filter="url(#gf2)"/>
+        <text x="41" y="28" text-anchor="middle" font-size="22">💻</text>
+        <text x="41" y="48" text-anchor="middle" fill="#00c896" font-size="9" font-weight="bold">CODE</text>
+        <text x="41" y="62" text-anchor="middle" fill="#5a7a96" font-size="7.5">VS Code · IntelliJ</text>
+        <text x="41" y="75" text-anchor="middle" fill="#5a7a96" font-size="7.5">feat/* branch</text>
+        <text x="41" y="102" text-anchor="middle" fill="#ff8fd6" font-size="7">AI: Copilot / Q Dev</text>
+      </g>
+      <path d="M192,102 L208,102" stroke="#00c896" stroke-width="1.5" marker-end="url(#lcg)"/>
+
+      <!-- 3 PR/MR -->
+      <g transform="translate(210,60)"><rect width="82" height="84" rx="5" fill="#0b1628" stroke="#3a6ec0" stroke-width="1.5" filter="url(#gf2)"/>
+        <text x="41" y="28" text-anchor="middle" font-size="22">🔀</text>
+        <text x="41" y="46" text-anchor="middle" fill="#3a6ec0" font-size="9" font-weight="bold">PR / MR</text>
+        <text x="41" y="60" text-anchor="middle" fill="#5a7a96" font-size="7.5">GitHub / GitLab</text>
+        <text x="41" y="73" text-anchor="middle" fill="#5a7a96" font-size="7.5">SAST · 2 reviewers</text>
+        <text x="41" y="102" text-anchor="middle" fill="#ff8fd6" font-size="7">AI: CodeRabbit</text>
+      </g>
+      <path d="M292,102 L308,102" stroke="#3a6ec0" stroke-width="1.5" marker-end="url(#lcy)"/>
+
+      <!-- 4 Build -->
+      <g transform="translate(310,60)"><rect width="82" height="84" rx="5" fill="#0b1628" stroke="#ff9f70" stroke-width="1.5" filter="url(#gf2)"/>
+        <text x="41" y="28" text-anchor="middle" font-size="22">🔨</text>
+        <text x="41" y="48" text-anchor="middle" fill="#ff9f70" font-size="9" font-weight="bold">BUILD</text>
+        <text x="41" y="62" text-anchor="middle" fill="#5a7a96" font-size="7.5">GitHub Actions</text>
+        <text x="41" y="75" text-anchor="middle" fill="#5a7a96" font-size="7.5">GitLab CI runners</text>
+        <text x="41" y="102" text-anchor="middle" fill="#ff8fd6" font-size="7">AI: smart test select</text>
+      </g>
+      <path d="M392,102 L408,102" stroke="#ff9f70" stroke-width="1.5" marker-end="url(#lcy)"/>
+
+      <!-- 5 Test -->
+      <g transform="translate(410,60)"><rect width="82" height="84" rx="5" fill="#0b1628" stroke="#c0ec00" stroke-width="2" filter="url(#gf2)"/>
+        <text x="41" y="28" text-anchor="middle" font-size="22">🧪</text>
+        <text x="41" y="48" text-anchor="middle" fill="#c0ec00" font-size="9" font-weight="bold">TEST</text>
+        <text x="41" y="62" text-anchor="middle" fill="#5a7a96" font-size="7.5">unit·E2E·DAST·k6</text>
+        <text x="41" y="75" text-anchor="middle" fill="#5a7a96" font-size="7.5">EKS/AKS ephemeral ns</text>
+        <text x="41" y="102" text-anchor="middle" fill="#ff8fd6" font-size="7">AI: gen · flaky · fuzz</text>
+      </g>
+      <path d="M492,102 L508,102" stroke="#c0ec00" stroke-width="1.5" marker-end="url(#lcy)"/>
+
+      <!-- 6 Registry -->
+      <g transform="translate(510,60)"><rect width="82" height="84" rx="5" fill="#0b1628" stroke="#00c896" stroke-width="1.5" filter="url(#gf2)"/>
+        <text x="41" y="28" text-anchor="middle" font-size="22">📦</text>
+        <text x="41" y="46" text-anchor="middle" fill="#00c896" font-size="9" font-weight="bold">REGISTRY</text>
+        <text x="41" y="60" text-anchor="middle" fill="#ff9900" font-size="7.5">ECR (AWS)</text>
+        <text x="41" y="73" text-anchor="middle" fill="#0078d4" font-size="7.5">ACR (Azure)</text>
+        <text x="41" y="102" text-anchor="middle" fill="#ff8fd6" font-size="7">AI: CVE triage</text>
+      </g>
+      <path d="M592,102 L608,102" stroke="#00c896" stroke-width="1.5" marker-end="url(#lcg)"/>
+
+      <!-- 7 Staging -->
+      <g transform="translate(610,60)"><rect width="82" height="84" rx="5" fill="#0b1628" stroke="#ff27ad" stroke-width="1.5" filter="url(#gf2)"/>
+        <text x="41" y="28" text-anchor="middle" font-size="22">🎭</text>
+        <text x="41" y="46" text-anchor="middle" fill="#ff27ad" font-size="9" font-weight="bold">STAGING</text>
+        <text x="41" y="60" text-anchor="middle" fill="#ff9900" font-size="7.5">ArgoCD → EKS</text>
+        <text x="41" y="73" text-anchor="middle" fill="#0078d4" font-size="7.5">ArgoCD → AKS</text>
+        <text x="41" y="102" text-anchor="middle" fill="#ff8fd6" font-size="7">AI: risk score · brief</text>
+      </g>
+      <path d="M692,102 L710,102" stroke="#ff27ad" stroke-width="1.5" marker-end="url(#lcy)"/>
+
+      <!-- 8 Gate -->
+      <g transform="translate(710,72)"><polygon points="0,30 32,0 64,30 32,60" fill="#0b1628" stroke="#ffb400" stroke-width="1.5" filter="url(#gf2)"/>
+        <text x="32" y="27" text-anchor="middle" fill="#ffb400" font-size="8" font-weight="bold">GATE</text>
+        <text x="32" y="40" text-anchor="middle" fill="#ffb400" font-size="10">✓</text>
+        <text x="32" y="78" text-anchor="middle" fill="#5a7a96" font-size="7.5">Mgr · SecChamp</text>
+        <text x="32" y="102" text-anchor="middle" fill="#ff8fd6" font-size="7">AI: approval brief</text>
+      </g>
+      <path d="M774,102 L792,102" stroke="#ffb400" stroke-width="1.5" marker-end="url(#lcg)"/>
+
+      <!-- 9 PROD -->
+      <g transform="translate(794,52)"><rect width="100" height="100" rx="6" fill="#0b1628" stroke="#00c896" stroke-width="2.5" filter="url(#gf2)"/>
+        <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(0,200,150,.1)" stroke-width="22"/>
+        <text x="50" y="36" text-anchor="middle" font-size="24">🚀</text>
+        <text x="50" y="58" text-anchor="middle" fill="#00c896" font-size="10" font-weight="bold">PROD</text>
+        <text x="50" y="72" text-anchor="middle" fill="#ff9900" font-size="7.5">EKS (AWS)</text>
+        <text x="50" y="85" text-anchor="middle" fill="#0078d4" font-size="7.5">AKS (Azure)</text>
+        <text x="50" y="122" text-anchor="middle" fill="#ff8fd6" font-size="7">AI: canary + rollback</text>
+      </g>
+      <path d="M894,102 L912,102" stroke="#00c896" stroke-width="1.5" marker-end="url(#lcg)"/>
+
+      <!-- 10 Monitor -->
+      <g transform="translate(914,60)"><rect width="154" height="84" rx="5" fill="#0b1628" stroke="#88a8d8" stroke-width="1.5" filter="url(#gf2)"/>
+        <text x="77" y="28" text-anchor="middle" font-size="22">📊</text>
+        <text x="77" y="48" text-anchor="middle" fill="#88a8d8" font-size="9" font-weight="bold">MONITOR</text>
+        <text x="77" y="62" text-anchor="middle" fill="#ff9900" font-size="7.5">CloudWatch (AWS)</text>
+        <text x="77" y="75" text-anchor="middle" fill="#0078d4" font-size="7.5">Azure Monitor / App Insights</text>
+        <text x="77" y="102" text-anchor="middle" fill="#ff8fd6" font-size="7">AI: AIOps · RCA · ChatOps</text>
+      </g>
+
+      <!-- Feedback loop -->
+      <path d="M991,144 Q991,212 535,212 Q80,212 42,144" stroke="#5a7a96" stroke-width="1" fill="none" stroke-dasharray="4 3" marker-end="url(#lcy)" opacity=".5"/>
+      <text x="535" y="209" text-anchor="middle" fill="#5a7a96" font-size="8">← continuous feedback → next sprint</text>
+    </svg>
+  </div>
+
+  <!-- Phase details -->
+  <div class="space-y-5">
+
+    <!-- Code + Review -->
+    <div>
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold" style="background:rgba(0,200,150,.15);border:1px solid #00c896;color:#00c896">2</div>
+        <h3 class="text-xl font-display font-bold" style="color:#00c896">Coding</h3>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="card cg p-4 text-sm">
+          <h4 class="font-bold mb-2" style="color:#00c896">🛠 Dev Workflow</h4>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span>Feature branch from <code>develop</code>; naming <code>feat/JIRA-123-desc</code>; signed commits enforced</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span>Local dev: Docker Compose or Telepresence for live K8s (EKS/AKS) tunnel</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span>Pre-commit hooks: lint · format · secret scan (Gitleaks) before every push</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span>Feature flags (LaunchDarkly / AWS AppConfig / Azure App Config) for safe rollout</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span>OWASP Top 10 secure coding checklist required for all new API endpoints</span></div>
+        </div>
+        <div class="card cb p-4 text-sm">
+          <h4 class="font-bold mb-2" style="color:#3a6ec0">🧩 Standards per Stack</h4>
+          <div class="bi"><div class="dot" style="background:#f89820"></div><span><strong style="color:#f89820">Java:</strong> Google Java Style; immutable records; Spring conventions</span></div>
+          <div class="bi"><div class="dot" style="background:#61dafb"></div><span><strong style="color:#61dafb">React:</strong> Functional components; React Query; typed props; Storybook</span></div>
+          <div class="bi"><div class="dot" style="background:#00add8"></div><span><strong style="color:#00add8">Go:</strong> Effective Go; explicit error handling; context propagation</span></div>
+          <div class="bi"><div class="dot" style="background:#dea584"></div><span><strong style="color:#dea584">Rust:</strong> Clippy clean; no <code>unwrap()</code> in prod; thiserror</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span>All secrets via env vars from Secrets Manager / Key Vault — never hardcoded</span></div>
+        </div>
+        <div class="card p-4 text-sm" style="background:linear-gradient(135deg,#0b1628,#071a14);border:1px solid rgba(0,200,150,.3)">
+          <h4 class="font-bold mb-2 flex items-center gap-2"><span class="ai-chip">🤖 AI</span><span style="color:#7dffd8">AI in Coding</span></h4>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">Copilot / Q Dev:</strong> Context-aware multi-line completions in VS Code / IntelliJ; chat-driven code gen</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">Cursor IDE:</strong> Whole-file generation and refactoring via LLM chat (Claude / GPT-4o backed)</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">Inline Security:</strong> Copilot Security (CodeQL) flags injection risks as you type</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">Boilerplate Gen:</strong> LLM generates Spring controllers, React components, Go handlers from spec</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">Doc Gen:</strong> AI writes JSDoc / JavaDoc / godoc from function signatures + body</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Build + Test -->
+    <div>
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold" style="background:rgba(255,159,112,.15);border:1px solid #ff9f70;color:#ff9f70">4</div>
+        <h3 class="text-xl font-display font-bold" style="color:#ff9f70">Build &amp; Test</h3>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="card p-4 text-sm">
+          <h4 class="font-bold mb-2" style="color:#ff9f70">🔨 Build Pipeline (GitHub Actions / GitLab CI)</h4>
+          <div class="bi"><div class="dot" style="background:#ff9f70"></div><span>Parallel matrix job: linux/amd64 + linux/arm64; BuildKit cache mounts (50%+ faster)</span></div>
+          <div class="bi"><div class="dot" style="background:#ff9f70"></div><span>Image pushed to ECR (AWS) or ACR (Azure) via OIDC — no static credentials ever</span></div>
+          <div class="bi"><div class="dot" style="background:#ff9f70"></div><span>Cosign keyless signing; SBOM (Syft/CycloneDX) attached as OCI attestation; SLSA L3</span></div>
+          <div class="bi"><div class="dot" style="background:#ff9f70"></div><span>Dependency lock files committed (<code>go.sum</code>, <code>package-lock.json</code>, <code>Cargo.lock</code>)</span></div>
+          <div class="bi"><div class="dot" style="background:#ff9f70"></div><span>Build artifacts (JARs / binaries) stored in S3 (AWS) / Azure Blob with SHA256 verification</span></div>
+          <div class="mt-2"><span class="ai-chip">🤖 AI: smart test select — ML skips unaffected suites (50% CI time saved)</span></div>
+        </div>
+        <div class="card p-4 text-sm" style="background:linear-gradient(135deg,#0b1628,#0d1408);border:1px solid rgba(192,236,0,.3)">
+          <h4 class="font-bold mb-2 flex items-center gap-2"><span class="ai-chip">🤖 AI</span><span style="color:#d4ff00">AI in Testing</span></h4>
+          <div class="p-2 rounded text-center text-xs font-mono mb-2" style="background:rgba(255,39,173,.1);border:1px solid rgba(255,39,173,.3);color:#ff8fd6">E2E — Playwright · Appium · Device Farm (AWS) / App Center (Azure)</div>
+          <div class="p-2 rounded text-center text-xs font-mono mb-2" style="background:rgba(192,236,0,.08);border:1px solid rgba(192,236,0,.3);color:#d4ff00">Integration — Testcontainers · Pact contracts · REST Assured</div>
+          <div class="p-2 rounded text-center text-xs font-mono mb-3" style="background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.3);color:#7dffd8">Unit — JUnit5 · Jest · Go test · Cargo test (70% of tests)</div>
+          <div class="bi"><div class="dot" style="background:#c0ec00"></div><span><strong style="color:#d4ff00">Test Gen:</strong> Copilot / Diffblue generate unit tests from new function signatures</span></div>
+          <div class="bi"><div class="dot" style="background:#c0ec00"></div><span><strong style="color:#d4ff00">Flaky Detect:</strong> ML auto-quarantines non-deterministic tests; flags for fix in next sprint</span></div>
+          <div class="bi"><div class="dot" style="background:#c0ec00"></div><span><strong style="color:#d4ff00">API Fuzzing:</strong> RESTler learns grammar from OpenAPI spec; generates unexpected inputs</span></div>
+          <div class="bi"><div class="dot" style="background:#c0ec00"></div><span><strong style="color:#d4ff00">Perf Regression:</strong> ML statistical test on P99 baseline; blocks merge on significant regression</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage + Prod -->
+    <div>
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold" style="background:rgba(0,200,150,.15);border:2px solid #00c896;color:#00c896">7</div>
+        <h3 class="text-xl font-display font-bold tgg" style="color:#00c896">Staging → Production Deploy</h3>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="card cp p-4 text-sm">
+          <h4 class="font-bold mb-2" style="color:#ff27ad">🎭 Staging</h4>
+          <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>ArgoCD syncs to staging ns in EKS (AWS) or AKS (Azure); mirrors prod config exactly</span></div>
+          <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>Security Hub / Defender CSPM scan on namespace; zero Critical CVEs required</span></div>
+          <div class="bi"><div class="dot" style="background:#ff27ad"></div><span>48h UAT window; stakeholder sign-off in Jira Service Management change ticket</span></div>
+        </div>
+        <div class="card cb p-4 text-sm">
+          <h4 class="font-bold mb-2" style="color:#3a6ec0">✅ Approval Gate</h4>
+          <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>GitHub Environments or GitLab Protected Environments enforce required reviewers before prod sync</span></div>
+          <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>App Manager + Security Champion sign-off; all gates auto-documented in audit log</span></div>
+          <div class="bi"><div class="dot" style="background:#3a6ec0"></div><span>P99 within 10% of baseline; all tests green; zero Critical findings</span></div>
+        </div>
+        <div class="card cg p-4 text-sm">
+          <h4 class="font-bold mb-2" style="color:#00c896">🚀 Production Deploy</h4>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span>Argo Rollouts: Blue/Green or Canary; traffic shifted via ALB (AWS) / Azure LB weights</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span>DB migrations: Flyway / Liquibase — backward-compatible; run as init container</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span>Rollback = git revert → ArgoCD re-syncs previous image in &lt;2 minutes</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span>Feature flags decouple deploy from release; gradual user segment exposure</span></div>
+        </div>
+        <div class="card p-4 text-sm" style="background:linear-gradient(135deg,#0b1628,#071a14);border:1px solid rgba(0,200,150,.45)">
+          <h4 class="font-bold mb-2 flex items-center gap-2"><span class="ai-chip">🤖 AI</span><span style="color:#7dffd8">AI in Prod Deploy</span></h4>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">Risk Score:</strong> AI scores release 0–100 based on diff size, CVEs, coverage, deploy history</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">Canary ML:</strong> Kayenta / Datadog Watchdog statistically validates canary vs. baseline traffic</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">Auto-Rollback:</strong> Argo Rollouts rolls back autonomously on anomaly within 60 seconds</span></div>
+          <div class="bi"><div class="dot" style="background:#00c896"></div><span><strong style="color:#7dffd8">Timing AI:</strong> ML suggests lowest-risk deploy window from historical traffic patterns</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monitor + Feedback -->
+    <div>
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold" style="background:rgba(136,168,216,.15);border:1px solid #88a8d8;color:#88a8d8">8</div>
+        <h3 class="text-xl font-display font-bold" style="color:#88a8d8">Monitor &amp; Feedback Loop</h3>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="card cb p-4 text-sm">
+          <h4 class="font-bold mb-2" style="color:#88a8d8">🔁 Feedback into Next Sprint</h4>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span>Sentry auto-creates Jira issues from prod errors with stack trace, user count, and severity</span></div>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span>Sprint retro reviews DORA metrics: deploy frequency, lead time, MTTR, change failure rate</span></div>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span>Feature flag analytics (LaunchDarkly / AWS AppConfig) feed A/B results into product roadmap</span></div>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span>User analytics (Amplitude / Mixpanel) convert funnel drop-offs to UX improvement stories</span></div>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span>Kubecost tags: cost per feature tracked across EKS (AWS) and AKS (Azure); expensive features flagged</span></div>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span>Blameless post-mortem within 48h of every P1 incident; runbook updated in GitHub / Confluence</span></div>
+        </div>
+        <div class="card p-4 text-sm" style="background:linear-gradient(135deg,#0b1628,#080f1f);border:1px solid rgba(136,168,216,.35)">
+          <h4 class="font-bold mb-2 flex items-center gap-2"><span class="ai-chip">🤖 AI</span><span style="color:#c8dde8">AIOps + Monitor AI</span></h4>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span><strong style="color:#c8dde8">RCA:</strong> DevOps Guru (AWS) / Dynatrace AI correlates metrics + logs + traces; 30-second Slack RCA summary</span></div>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span><strong style="color:#c8dde8">Anomaly:</strong> ML baselines each service; detects subtle pre-incident signals hours before user impact</span></div>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span><strong style="color:#c8dde8">Alert Dedup:</strong> AI clusters 50 correlated alerts into one incident with priority and context</span></div>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span><strong style="color:#c8dde8">Post-Mortem:</strong> LLM drafts blameless post-mortem from incident timeline, logs, and Slack thread</span></div>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span><strong style="color:#c8dde8">Backlog AI:</strong> AI analyzes crash reports + perf data + feedback; recommends sprint priority ordering</span></div>
+          <div class="bi"><div class="dot" style="background:#88a8d8"></div><span><strong style="color:#c8dde8">ChatOps:</strong> Ask Slack bot "why is prod slow?" — AI queries CloudWatch / Azure Monitor and responds in plain English</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Summary table -->
+  <div class="card p-4 mt-6" style="border:1px solid rgba(255,180,0,.3)">
+    <h3 class="font-display font-bold text-sm mb-3" style="color:#ffb400">🤖 AI Usage Summary — Full App Dev Lifecycle</h3>
+    <div class="rt">
+      <table>
+        <thead><tr><th>PHASE</th><th>Primary AI Tool</th><th>What AI Does</th><th>Human Role</th><th>Est. Saved</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#ffb400">Plan</td><td>Claude / GPT-4o, Galileo AI</td><td>Draft stories, wireframes, threat model, OpenAPI spec</td><td>Review &amp; approve all outputs</td><td>~40%</td></tr>
+          <tr><td style="color:#00c896">Code</td><td>GitHub Copilot / Amazon Q Dev</td><td>Completions, boilerplate, docs, refactoring</td><td>Accept/reject, architecture decisions</td><td>~35%</td></tr>
+          <tr><td style="color:#3a6ec0">Review (GitHub/GitLab)</td><td>CodeRabbit / Copilot Review</td><td>Bug flags, security explains, PR/MR summary, fix suggest</td><td>Final merge decision, design judgment</td><td>~50%</td></tr>
+          <tr><td style="color:#ff9f70">Build (GH Actions / GL CI)</td><td>ML pipeline + AI cache</td><td>Smart test select, fail prediction, SBOM delta explain</td><td>Investigate predicted failures</td><td>~30%</td></tr>
+          <tr><td style="color:#c0ec00">Test</td><td>Diffblue / Copilot / RESTler</td><td>Test gen, edge cases, fuzzing, flaky detection</td><td>Review test logic, define goals</td><td>~60%</td></tr>
+          <tr><td style="color:#ff27ad">Staging (EKS / AKS)</td><td>Argo Rollouts + LLM briefs</td><td>Risk scoring, regression compare, UAT scenario gen</td><td>UAT sign-off, security approval</td><td>~45%</td></tr>
+          <tr><td style="color:#00c896">Prod Deploy (EKS / AKS)</td><td>Kayenta / Datadog Watchdog</td><td>Canary analysis, auto-rollback, timing optimization</td><td>Monitor, override if needed</td><td>~70%</td></tr>
+          <tr><td style="color:#88a8d8">Monitor (CloudWatch / Azure Monitor)</td><td>DevOps Guru / Dynatrace</td><td>Anomaly detect, RCA, alert dedup, post-mortem draft</td><td>Incident command, resolution decisions</td><td>~55%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-xs mt-2 font-mono" style="color:#5a7a96">* Estimates from GitHub/Google DORA research. Actual savings vary by team and codebase maturity.</p>
+  </div>
+
+</div><!-- /tab-appdev -->
+
+</main>
+
+<footer class="border-t py-5 px-6 mt-8" style="background:rgba(6,13,26,.92);border-color:#1a3050">
+  <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="font-mono text-xs" style="color:#5a7a96">DevSecOps Platform · GitLab CI · GitHub Actions · AWS EKS · Azure AKS · Kubernetes</p>
+      <p class="font-mono text-xs mt-1" style="color:#3a5060">Secure by design · Cloud-agnostic · AI-augmented · Zero trust · GitOps</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <span class="ttag" style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.18);color:#5a7a96">NIST CSF</span>
+      <span class="ttag" style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.18);color:#5a7a96">SOC 2</span>
+      <span class="ttag" style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.18);color:#5a7a96">CIS Benchmarks</span>
+      <span class="ttag" style="background:rgba(255,153,0,.06);border:1px solid rgba(255,153,0,.18);color:#5a7a96">AWS Well-Architected</span>
+      <span class="ttag" style="background:rgba(0,114,198,.06);border:1px solid rgba(0,114,198,.18);color:#5a7a96">Azure CAF</span>
+      <span class="ttag" style="background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.18);color:#5a7a96">DORA Metrics</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+function sw(name, e) {
+  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (e && e.currentTarget) e.currentTarget.classList.add('active');
+  // stagger card entrance for this tab
+  document.querySelectorAll('#tab-' + name + ' .card').forEach((c, i) => {
+    c.classList.remove('vis');
+    setTimeout(() => c.classList.add('vis'), i * 40);
+  });
+}
+// IntersectionObserver for initial tab
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.06 });
+document.querySelectorAll('.card').forEach(c => obs.observe(c));
+// Trigger visible cards on first tab
+setTimeout(() => {
+  document.querySelectorAll('#tab-pipeline .card').forEach((c, i) => setTimeout(() => c.classList.add('vis'), i * 45));
+}, 120);
+</script>
+</body>
+</html>
