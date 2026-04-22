@@ -157,16 +157,17 @@ legal-doc-processor/
 
 ## Known gaps & caveats
 
-This is an **unverified** example scaffold — I could not compile it in my build environment (no Maven Central access). Treat the following as likely-to-bite:
+This is an example scaffold that I could not compile inside my build sandbox (no Maven Central access there). One compile error was reported back from a real `docker compose build` and fixed; others may surface. Known risky spots:
 
-1. **Spring Boot 3.5.13** — if that exact patch isn't published, drop to the nearest 3.5.x in `pom.xml`.
-2. **Elasticsearch 8.15 fluent builders** in `ElasticsearchService` (`p -> p.keyword(k -> k)`, nested mappings, etc.) were written from memory and are the most likely place for compile errors.
-3. **Temporal `WorkflowServiceStubs.blockingStub()` + `GetSystemInfoRequest`** in `HealthCheckService` — the import path is correct for recent 1.2x releases but has moved historically.
-4. **SQS consumer is a simple `@Scheduled` poller**, not production-grade. No dead-letter queue handling, no visibility-timeout tuning.
-5. **No Temporal auth** — uses the default namespace with no TLS. Fine for local; not fine for anywhere else.
-6. **CORS is open on the WebSocket** (`setAllowedOrigins("*")`). Close it down for non-local deployments.
-7. **Frontend loads Tailwind and OpenLayers from CDNs** — fine for a demo, replace with a real build pipeline for production.
-8. **Execute-bit on `localstack-init/init-resources.sh`** may be lost depending on how you extract the archive; `chmod +x localstack-init/*.sh` if LocalStack init doesn't run.
+1. **Spring Boot 3.5.13** — verified to exist (released March 26, 2026). If an older mirror is stale, drop to 3.5.12.
+2. **Apache Tika 3.x** — `Metadata.RESOURCE_NAME_KEY` was moved to `TikaCoreProperties.RESOURCE_NAME_KEY` back in Tika 2.0; this repo uses the new location. ✅ Fixed.
+3. **Temporal health check** — uses `getClusterInfo(GetClusterInfoRequest)` (the pattern recommended on the Temporal community forum) rather than the lower-level `getSystemInfo`. ✅ Fixed.
+4. **Elasticsearch 8.15 fluent builders** in `ElasticsearchService` — the nested `properties(...)` / `keyword(k -> k)` / `long_(...)` / `double_(...)` lambda chains were written against the 8.x client shape. If anything here won't compile, paste the error and I'll correct the specific builder call.
+5. **SQS consumer is a simple `@Scheduled` poller**, not production-grade. No DLQ, no visibility-timeout tuning.
+6. **No Temporal auth** — default namespace, no TLS. Fine for local; not for deployment.
+7. **CORS is open on the WebSocket** (`setAllowedOrigins("*")`). Restrict before deploying.
+8. **Frontend pulls Tailwind and OpenLayers from CDNs** — fine for a demo, replace with a real build for production.
+9. **Execute-bit on `localstack-init/init-resources.sh`** may be lost on some extraction tools; `chmod +x localstack-init/*.sh` if LocalStack init doesn't run.
 
 ## License
 

@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Fluency for Developers & DevSecOps</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --ibm-blue-10: #edf5ff;
+      --ibm-blue-20: #d0e2ff;
+      --ibm-blue-40: #78a9ff;
+      --ibm-blue-60: #0f62fe;
+      --ibm-blue-70: #0043ce;
+      --ibm-blue-80: #002d9c;
+      --ibm-blue-90: #001d6c;
+      --ibm-blue-100: #001141;
+      --ibm-gray-10: #f4f4f4;
+      --ibm-gray-20: #e0e0e0;
+      --ibm-gray-100: #161616;
+    }
+    * { font-family: 'IBM Plex Sans', sans-serif; }
+    code, pre { font-family: 'IBM Plex Mono', monospace !important; }
+    html { scroll-behavior: smooth; }
+
+    body { background: #f4f4f4; color: #161616; }
+
+    /* IBM-style grid lines */
+    .ibm-grid-bg {
+      background-image: linear-gradient(rgba(15,98,254,0.05) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(15,98,254,0.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    /* Hero gradient */
+    .hero-bg {
+      background: linear-gradient(135deg, #001141 0%, #001d6c 40%, #0043ce 75%, #0f62fe 100%);
+    }
+
+    /* Card hover */
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(15,98,254,0.2);
+      border-color: #0f62fe;
+    }
+
+    /* Tab system */
+    .tab-btn { transition: all 0.2s; border-bottom: 3px solid transparent; }
+    .tab-btn.active { border-bottom-color: #0f62fe; color: #0f62fe; background: #edf5ff; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Accordion */
+    .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .accordion-body.open { max-height: 2000px; }
+    .accordion-icon { transition: transform 0.3s; }
+    .accordion-icon.open { transform: rotate(45deg); }
+
+    /* Step connector */
+    .step-line::after {
+      content: '';
+      position: absolute;
+      left: 19px; top: 40px;
+      width: 2px; height: calc(100% - 10px);
+      background: linear-gradient(to bottom, #0f62fe, #d0e2ff);
+    }
+
+    /* Code block copy button */
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: #0f62fe; color: white;
+      border: none; border-radius: 2px;
+      padding: 4px 10px; font-size: 11px;
+      cursor: pointer; opacity: 0;
+      transition: opacity 0.2s;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .code-wrap:hover .copy-btn { opacity: 1; }
+
+    /* Pill badge */
+    .badge { display: inline-flex; align-items: center; gap: 4px; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #e0e0e0; }
+    ::-webkit-scrollbar-thumb { background: #0f62fe; border-radius: 3px; }
+
+    /* Nav link underline */
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: ''; position: absolute; bottom: -2px; left: 0;
+      width: 0; height: 2px; background: #78a9ff;
+      transition: width 0.2s;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    /* IBM rule line */
+    .ibm-rule { border: none; border-top: 1px solid #e0e0e0; margin: 0; }
+
+    /* Workflow arrow */
+    .flow-arrow { color: #0f62fe; font-size: 20px; }
+
+    /* Sticky nav */
+    #navbar {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(0,17,65,0.97);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(15,98,254,0.3);
+    }
+
+    /* Glow accent */
+    .glow { box-shadow: 0 0 20px rgba(15,98,254,0.4); }
+
+    /* D-card */
+    .d-card {
+      background: white;
+      border-left: 4px solid #0f62fe;
+      border-radius: 0 4px 4px 0;
+    }
+    .d-num {
+      width: 48px; height: 48px;
+      background: #0f62fe; color: white;
+      font-size: 22px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .workflow-box {
+      background: white;
+      border: 1px solid #d0e2ff;
+      border-radius: 4px;
+      padding: 12px 16px;
+      position: relative;
+    }
+    .workflow-box::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: #0f62fe;
+      border-radius: 3px 0 0 3px;
+    }
+  </style>
+</head>
+<body class="ibm-grid-bg">
+
+<!-- ── NAVIGATION ──────────────────────────────────── -->
+<nav id="navbar" class="px-6 py-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-blue-500 flex items-center justify-center rounded-sm glow">
+        <svg viewBox="0 0 24 24" fill="white" class="w-5 h-5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span class="text-white font-semibold text-sm tracking-widest uppercase">AI Dev &amp; DevSecOps Guide</span>
+    </div>
+    <div class="hidden md:flex items-center gap-6 text-xs text-blue-200 uppercase tracking-wider">
+      <a href="#fluency" class="nav-link hover:text-white transition">Fluency</a>
+      <a href="#bestpractices" class="nav-link hover:text-white transition">Best Practices</a>
+      <a href="#java" class="nav-link hover:text-white transition">Java</a>
+      <a href="#golang" class="nav-link hover:text-white transition">Go</a>
+      <a href="#devsecops" class="nav-link hover:text-white transition">DevSecOps</a>
+      <a href="#prompts" class="nav-link hover:text-white transition">Prompt Library</a>
+    </div>
+    <button id="mobileMenuBtn" class="md:hidden text-white text-xl">☰</button>
+  </div>
+  <!-- Mobile menu -->
+  <div id="mobileMenu" class="hidden md:hidden mt-3 flex flex-col gap-2 text-blue-200 text-sm pb-2">
+    <a href="#fluency" class="hover:text-white px-2 py-1">AI Fluency &amp; 4 Ds</a>
+    <a href="#bestpractices" class="hover:text-white px-2 py-1">Best Practices</a>
+    <a href="#java" class="hover:text-white px-2 py-1">Java Workflow</a>
+    <a href="#golang" class="hover:text-white px-2 py-1">Golang Workflow</a>
+    <a href="#devsecops" class="hover:text-white px-2 py-1">DevSecOps</a>
+    <a href="#prompts" class="hover:text-white px-2 py-1">Prompt Library</a>
+  </div>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────── -->
+<section class="hero-bg py-20 px-6 text-white">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row items-center gap-12">
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="bg-blue-500 text-white text-xs px-3 py-1 rounded-sm font-semibold tracking-widest uppercase">Anthropic × DevSecOps</span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">
+          AI-Powered<br/>
+          <span class="text-blue-300">Developer &amp;</span><br/>
+          DevSecOps Guide
+        </h1>
+        <p class="text-blue-100 text-lg mb-6 max-w-xl leading-relaxed">
+          Master AI-assisted development with Anthropic's AI Fluency framework. From Java microservices to Golang APIs, Terraform IaC to Kubernetes pipelines — learn to build smarter, faster, and more securely.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="#fluency" class="bg-blue-500 hover:bg-blue-400 text-white px-5 py-2.5 text-sm font-semibold rounded-sm transition">Start with the 4 Ds →</a>
+          <a href="#devsecops" class="border border-blue-400 hover:bg-blue-900 text-white px-5 py-2.5 text-sm font-semibold rounded-sm transition">DevSecOps Workflows</a>
+        </div>
+      </div>
+      <div class="flex-1 grid grid-cols-2 gap-4 text-sm">
+        <div class="bg-blue-900 bg-opacity-60 border border-blue-700 rounded-sm p-4 card-hover">
+          <div class="text-blue-300 text-2xl mb-2">☕</div>
+          <div class="font-semibold text-white">Java Workflows</div>
+          <div class="text-blue-200 text-xs mt-1">Spring Boot · Microservices · Maven/Gradle</div>
+        </div>
+        <div class="bg-blue-900 bg-opacity-60 border border-blue-700 rounded-sm p-4 card-hover">
+          <div class="text-blue-300 text-2xl mb-2">🐹</div>
+          <div class="font-semibold text-white">Golang Workflows</div>
+          <div class="text-blue-200 text-xs mt-1">Go Modules · gRPC · REST APIs</div>
+        </div>
+        <div class="bg-blue-900 bg-opacity-60 border border-blue-700 rounded-sm p-4 card-hover">
+          <div class="text-blue-300 text-2xl mb-2">🔒</div>
+          <div class="font-semibold text-white">DevSecOps</div>
+          <div class="text-blue-200 text-xs mt-1">SAST · DAST · Supply Chain Security</div>
+        </div>
+        <div class="bg-blue-900 bg-opacity-60 border border-blue-700 rounded-sm p-4 card-hover">
+          <div class="text-blue-300 text-2xl mb-2">⚙️</div>
+          <div class="font-semibold text-white">CI/CD + IaC</div>
+          <div class="text-blue-200 text-xs mt-1">Terraform · Helm · Kubernetes · Pipelines</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── AI FLUENCY + 4 Ds ───────────────────────────── -->
+<section id="fluency" class="py-16 px-6 bg-white">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="w-2 h-8 bg-blue-600 block rounded-sm"></span>
+      <span class="text-blue-600 text-xs font-semibold uppercase tracking-widest">Anthropic AI Fluency Framework</span>
+    </div>
+    <h2 class="text-3xl font-bold text-gray-900 mb-2 ml-5">The 4 Ds of AI-Assisted Development</h2>
+    <p class="text-gray-500 ml-5 mb-10 max-w-2xl">Anthropic's recommended cognitive workflow for integrating AI into technical tasks. Master these four phases to get consistently high-quality results from any AI coding assistant.</p>
+
+    <div class="grid md:grid-cols-2 gap-5 mb-12">
+      <!-- D1 -->
+      <div class="d-card p-5 shadow-sm card-hover">
+        <div class="flex items-start gap-4">
+          <div class="d-num">D1</div>
+          <div>
+            <h3 class="text-xl font-bold text-blue-800 mb-1">Describe</h3>
+            <p class="text-sm text-gray-600 mb-3">Be explicit and precise about your intent, context, and constraints. AI cannot read your mind — the richer your description, the better the output.</p>
+            <div class="bg-blue-50 border border-blue-100 rounded-sm p-3 text-xs text-blue-800">
+              <strong>Key elements to describe:</strong>
+              <ul class="mt-1 space-y-1 list-disc list-inside text-gray-600">
+                <li>Programming language, framework &amp; version</li>
+                <li>What the code should do (inputs/outputs/behavior)</li>
+                <li>Non-functional requirements (performance, security, style guide)</li>
+                <li>Constraints (no external deps, must be thread-safe, etc.)</li>
+                <li>Team conventions and existing patterns</li>
+              </ul>
+            </div>
+            <div class="mt-3 bg-gray-900 rounded-sm p-3 text-xs text-green-300 font-mono">
+              <span class="text-gray-500">// Example Describe prompt</span><br/>
+              "I'm building a Spring Boot 3.2 REST API. <br/>
+              Generate a @Service class that queries<br/>
+              PostgreSQL via JPA, handles pagination,<br/>
+              and throws custom exceptions. No Lombok."
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- D2 -->
+      <div class="d-card p-5 shadow-sm card-hover" style="border-left-color: #0043ce;">
+        <div class="flex items-start gap-4">
+          <div class="d-num" style="background:#0043ce;">D2</div>
+          <div>
+            <h3 class="text-xl font-bold text-blue-900 mb-1">Direct</h3>
+            <p class="text-sm text-gray-600 mb-3">Guide the AI's approach, output format, and reasoning style. Direct = you're the architect; AI is the implementer.</p>
+            <div class="bg-blue-50 border border-blue-100 rounded-sm p-3 text-xs text-blue-800">
+              <strong>Directing techniques:</strong>
+              <ul class="mt-1 space-y-1 list-disc list-inside text-gray-600">
+                <li>Specify the output format (class, function, YAML, JSON)</li>
+                <li>Tell it to think step-by-step before writing code</li>
+                <li>Set persona: "Act as a senior Go engineer"</li>
+                <li>Use negative instructions: "Do not use global variables"</li>
+                <li>Chain tasks: "First write tests, then implementation"</li>
+              </ul>
+            </div>
+            <div class="mt-3 bg-gray-900 rounded-sm p-3 text-xs text-green-300 font-mono">
+              <span class="text-gray-500">// Direct technique</span><br/>
+              "Act as a DevSecOps engineer.<br/>
+              First, explain the security risks.<br/>
+              Then write a Dockerfile following<br/>
+              CIS Benchmark hardening guidelines.<br/>
+              Output only the Dockerfile."
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- D3 -->
+      <div class="d-card p-5 shadow-sm card-hover" style="border-left-color: #001d6c;">
+        <div class="flex items-start gap-4">
+          <div class="d-num" style="background:#001d6c;">D3</div>
+          <div>
+            <h3 class="text-xl font-bold text-blue-900 mb-1">Dialogue</h3>
+            <p class="text-sm text-gray-600 mb-3">Treat the AI as a senior peer. Iterate, refine, push back, and ask follow-up questions until the output meets your standards.</p>
+            <div class="bg-blue-50 border border-blue-100 rounded-sm p-3 text-xs text-blue-800">
+              <strong>Dialogue strategies:</strong>
+              <ul class="mt-1 space-y-1 list-disc list-inside text-gray-600">
+                <li>"That works, but can you refactor for better testability?"</li>
+                <li>"Explain why you chose that approach vs. X"</li>
+                <li>"What edge cases are you not handling?"</li>
+                <li>"Show me the unit tests for this logic"</li>
+                <li>"What would a security reviewer flag here?"</li>
+              </ul>
+            </div>
+            <div class="mt-3 bg-gray-900 rounded-sm p-3 text-xs text-yellow-300 font-mono">
+              <span class="text-gray-500">// Follow-up prompts</span><br/>
+              "Good. Now add OpenTelemetry tracing.<br/>
+              Keep backward compatibility.<br/>
+              What did you change and why?"
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- D4 -->
+      <div class="d-card p-5 shadow-sm card-hover" style="border-left-color: #78a9ff;">
+        <div class="flex items-start gap-4">
+          <div class="d-num" style="background:#78a9ff;">D4</div>
+          <div>
+            <h3 class="text-xl font-bold text-blue-900 mb-1">Decide</h3>
+            <p class="text-sm text-gray-600 mb-3">You own the output. Review, validate, test, and make the final call. AI augments — it doesn't replace — your judgment and accountability.</p>
+            <div class="bg-blue-50 border border-blue-100 rounded-sm p-3 text-xs text-blue-800">
+              <strong>Decision checklist:</strong>
+              <ul class="mt-1 space-y-1 list-disc list-inside text-gray-600">
+                <li>✅ Does it meet functional requirements?</li>
+                <li>✅ Does it follow team coding standards?</li>
+                <li>✅ Are there security vulnerabilities?</li>
+                <li>✅ Is it performant and scalable?</li>
+                <li>✅ Is it tested and observable?</li>
+                <li>✅ Do you fully understand what it does?</li>
+              </ul>
+            </div>
+            <div class="mt-3 bg-gray-900 rounded-sm p-3 text-xs text-red-300 font-mono">
+              <span class="text-gray-500">// Never ship blindly</span><br/>
+              Always run: unit tests, linting,<br/>
+              SAST scan, peer review<br/>
+              before committing AI-generated code.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Fluency Workflow Diagram -->
+    <div class="bg-gradient-to-r from-blue-900 to-blue-800 rounded-sm p-6 text-white">
+      <h3 class="text-lg font-bold mb-5 text-blue-200 uppercase tracking-wider text-sm">AI Fluency Workflow — End to End</h3>
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <div class="text-center">
+          <div class="bg-blue-600 rounded-sm px-4 py-3 text-sm font-semibold">🎯 Define Task</div>
+          <div class="text-xs text-blue-300 mt-1">Requirements</div>
+        </div>
+        <span class="flow-arrow text-blue-300">→</span>
+        <div class="text-center">
+          <div class="bg-blue-700 rounded-sm px-4 py-3 text-sm font-semibold">📝 Describe</div>
+          <div class="text-xs text-blue-300 mt-1">Context + Constraints</div>
+        </div>
+        <span class="flow-arrow text-blue-300">→</span>
+        <div class="text-center">
+          <div class="bg-blue-700 rounded-sm px-4 py-3 text-sm font-semibold">🎛️ Direct</div>
+          <div class="text-xs text-blue-300 mt-1">Format + Approach</div>
+        </div>
+        <span class="flow-arrow text-blue-300">→</span>
+        <div class="text-center">
+          <div class="bg-blue-700 rounded-sm px-4 py-3 text-sm font-semibold">💬 Dialogue</div>
+          <div class="text-xs text-blue-300 mt-1">Iterate + Refine</div>
+        </div>
+        <span class="flow-arrow text-blue-300">→</span>
+        <div class="text-center">
+          <div class="bg-blue-500 rounded-sm px-4 py-3 text-sm font-semibold">✅ Decide</div>
+          <div class="text-xs text-blue-300 mt-1">Review + Ship</div>
+        </div>
+        <span class="flow-arrow text-blue-300">→</span>
+        <div class="text-center">
+          <div class="bg-green-700 rounded-sm px-4 py-3 text-sm font-semibold">🚀 Deploy</div>
+          <div class="text-xs text-blue-300 mt-1">CI/CD Pipeline</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BEST PRACTICES ──────────────────────────────── -->
+<section id="bestpractices" class="py-16 px-6 bg-blue-50">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="w-2 h-8 bg-blue-600 block rounded-sm"></span>
+      <span class="text-blue-600 text-xs font-semibold uppercase tracking-widest">Core Principles</span>
+    </div>
+    <h2 class="text-3xl font-bold text-gray-900 mb-8 ml-5">AI Coding Best Practices</h2>
+
+    <div class="grid md:grid-cols-3 gap-4 mb-8">
+      <div class="bg-white border border-blue-100 rounded-sm p-5 card-hover shadow-sm">
+        <div class="w-10 h-10 bg-blue-600 rounded-sm flex items-center justify-center text-white text-lg mb-3">🧠</div>
+        <h3 class="font-bold text-blue-900 mb-2">Context is King</h3>
+        <p class="text-sm text-gray-600">Always provide your tech stack, version, and architectural context. A prompt with context is 3× more likely to generate usable code than a bare question.</p>
+      </div>
+      <div class="bg-white border border-blue-100 rounded-sm p-5 card-hover shadow-sm">
+        <div class="w-10 h-10 bg-blue-700 rounded-sm flex items-center justify-center text-white text-lg mb-3">🔍</div>
+        <h3 class="font-bold text-blue-900 mb-2">Verify Everything</h3>
+        <p class="text-sm text-gray-600">AI can hallucinate APIs, introduce subtle bugs, or miss edge cases. Always run tests, linting, and security scans on AI-generated code before merging.</p>
+      </div>
+      <div class="bg-white border border-blue-100 rounded-sm p-5 card-hover shadow-sm">
+        <div class="w-10 h-10 bg-blue-800 rounded-sm flex items-center justify-center text-white text-lg mb-3">🔄</div>
+        <h3 class="font-bold text-blue-900 mb-2">Iterate in Small Steps</h3>
+        <p class="text-sm text-gray-600">Break large tasks into smaller prompts. Request one function at a time, one file at a time. This gives you checkpoints and keeps context focused.</p>
+      </div>
+      <div class="bg-white border border-blue-100 rounded-sm p-5 card-hover shadow-sm">
+        <div class="w-10 h-10 bg-blue-600 rounded-sm flex items-center justify-center text-white text-lg mb-3">🛡️</div>
+        <h3 class="font-bold text-blue-900 mb-2">Security-First Prompting</h3>
+        <p class="text-sm text-gray-600">Explicitly request secure defaults: parameterized queries, input validation, least-privilege IAM, no hardcoded secrets. AI won't add these unless you ask.</p>
+      </div>
+      <div class="bg-white border border-blue-100 rounded-sm p-5 card-hover shadow-sm">
+        <div class="w-10 h-10 bg-blue-700 rounded-sm flex items-center justify-center text-white text-lg mb-3">📚</div>
+        <h3 class="font-bold text-blue-900 mb-2">Test-Driven Prompting</h3>
+        <p class="text-sm text-gray-600">Ask for tests before implementation. "Write JUnit 5 tests for this service, then write the implementation that passes them." TDD improves AI output quality significantly.</p>
+      </div>
+      <div class="bg-white border border-blue-100 rounded-sm p-5 card-hover shadow-sm">
+        <div class="w-10 h-10 bg-blue-800 rounded-sm flex items-center justify-center text-white text-lg mb-3">📦</div>
+        <h3 class="font-bold text-blue-900 mb-2">Treat AI as a Junior Dev</h3>
+        <p class="text-sm text-gray-600">Review AI code like you'd review a PR from a talented but inexperienced developer. It may miss business logic, organizational patterns, or nuanced security requirements.</p>
+      </div>
+    </div>
+
+    <!-- Do / Don't -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="bg-white border-l-4 border-green-500 rounded-sm p-5 shadow-sm">
+        <h3 class="font-bold text-green-700 mb-3 flex items-center gap-2"><span>✅</span> DO These Things</h3>
+        <ul class="text-sm text-gray-700 space-y-2">
+          <li class="flex gap-2"><span class="text-green-500 mt-0.5">▸</span>Paste your existing code for refactoring or review tasks</li>
+          <li class="flex gap-2"><span class="text-green-500 mt-0.5">▸</span>Specify the exact error message when debugging</li>
+          <li class="flex gap-2"><span class="text-green-500 mt-0.5">▸</span>Request explanations for generated code</li>
+          <li class="flex gap-2"><span class="text-green-500 mt-0.5">▸</span>Use AI for boilerplate, CRUD scaffolding, and config generation</li>
+          <li class="flex gap-2"><span class="text-green-500 mt-0.5">▸</span>Ask for multiple approaches: "Show me 3 ways to solve this"</li>
+          <li class="flex gap-2"><span class="text-green-500 mt-0.5">▸</span>Use AI to write commit messages and documentation</li>
+          <li class="flex gap-2"><span class="text-green-500 mt-0.5">▸</span>Ask AI to review your code for security/performance issues</li>
+        </ul>
+      </div>
+      <div class="bg-white border-l-4 border-red-400 rounded-sm p-5 shadow-sm">
+        <h3 class="font-bold text-red-600 mb-3 flex items-center gap-2"><span>❌</span> AVOID These Pitfalls</h3>
+        <ul class="text-sm text-gray-700 space-y-2">
+          <li class="flex gap-2"><span class="text-red-400 mt-0.5">▸</span>Pasting secrets, credentials, or PII in prompts</li>
+          <li class="flex gap-2"><span class="text-red-400 mt-0.5">▸</span>Asking for entire application architectures in one prompt</li>
+          <li class="flex gap-2"><span class="text-red-400 mt-0.5">▸</span>Shipping code you don't understand or haven't reviewed</li>
+          <li class="flex gap-2"><span class="text-red-400 mt-0.5">▸</span>Relying on AI for current CVE or vulnerability knowledge (stale data)</li>
+          <li class="flex gap-2"><span class="text-red-400 mt-0.5">▸</span>Using AI for compliance decisions without expert review</li>
+          <li class="flex gap-2"><span class="text-red-400 mt-0.5">▸</span>Ignoring linter warnings on AI-generated code</li>
+          <li class="flex gap-2"><span class="text-red-400 mt-0.5">▸</span>Treating AI output as ground truth for architecture decisions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── JAVA WORKFLOW ────────────────────────────────── -->
+<section id="java" class="py-16 px-6 bg-white">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="w-2 h-8 bg-blue-600 block rounded-sm"></span>
+      <span class="text-blue-600 text-xs font-semibold uppercase tracking-widest">Chat Feature Workflow</span>
+    </div>
+    <h2 class="text-3xl font-bold text-gray-900 mb-2 ml-5">☕ Java Project Workflow</h2>
+    <p class="text-gray-500 ml-5 mb-8">Spring Boot 3 · Maven · JPA · JUnit 5 · Docker · GitHub Actions</p>
+
+    <!-- Tabs -->
+    <div class="flex gap-0 border-b border-gray-200 mb-6 overflow-x-auto">
+      <button class="tab-btn active px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="java-scaffold">🏗️ Scaffold</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="java-service">⚙️ Service Layer</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="java-tests">🧪 Tests</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="java-security">🔒 Security</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="java-docker">🐳 Docker</button>
+    </div>
+
+    <!-- Java: Scaffold -->
+    <div id="java-scaffold" class="tab-content active">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Step 1 — Project Setup Chat Prompts</h3>
+          <div class="space-y-3">
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Prompt 1 · Describe + Direct</div>
+              <p class="text-sm text-gray-700">"I'm starting a Spring Boot 3.2 REST API for an inventory management system. Generate a Maven pom.xml with: spring-boot-starter-web, spring-boot-starter-data-jpa, spring-boot-starter-security, springdoc-openapi-starter-webmvc-ui, postgresql driver, flyway, mapstruct, and lombok. Java 21. Include spring-boot-maven-plugin configured for layered Docker builds."</p>
+            </div>
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Prompt 2 · Dialogue</div>
+              <p class="text-sm text-gray-700">"Good. Now generate the project directory structure following Domain-Driven Design: controller, service, repository, domain, dto, mapper, config, exception packages. Show it as a tree."</p>
+            </div>
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Prompt 3 · Decide</div>
+              <p class="text-sm text-gray-700">"Create the main Application class and an application.yml with profiles for dev and prod. Use environment variables for all secrets. No hardcoded passwords."</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample Output — application.yml</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-yaml">spring:
+  application:
+    name: inventory-api
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/inventory}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    show-sql: true
+  logging:
+    level:
+      com.company.inventory: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    show-sql: false</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Java: Service -->
+    <div id="java-service" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Service Layer Chat Prompts</h3>
+          <div class="space-y-3">
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Prompt — Full 4D Flow</div>
+              <p class="text-sm text-gray-700">"<strong>Describe:</strong> I need a ProductService class for inventory. It manages Product entities (id, sku, name, quantity, price, category). <strong>Direct:</strong> Use @Transactional, inject ProductRepository and ProductMapper. Methods: findAll(Pageable), findBySku(String), create(ProductRequest), update(Long, ProductRequest), delete(Long). Throw ResourceNotFoundException if not found. Return ProductResponse DTOs. No Lombok. Add SLF4J logging."</p>
+            </div>
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Follow-up · Dialogue</div>
+              <p class="text-sm text-gray-700">"The update method should use optimistic locking. Add @Version to the entity and handle ObjectOptimisticLockingFailureException. Also add a method to bulk update quantities that accepts a Map&lt;Long, Integer&gt; and is processed in a single transaction."</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample Output — ProductService</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-java">@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ProductService {
+
+    private final ProductRepository repository;
+    private final ProductMapper mapper;
+
+    @Transactional(readOnly = true)
+    public Page&lt;ProductResponse&gt; findAll(Pageable pageable) {
+        log.debug("Fetching products page: {}", pageable);
+        return repository.findAll(pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public ProductResponse findBySku(String sku) {
+        return repository.findBySku(sku)
+                .map(mapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product not found: " + sku));
+    }
+
+    @Transactional
+    public ProductResponse create(ProductRequest request) {
+        log.info("Creating product: {}", request.sku());
+        if (repository.existsBySku(request.sku())) {
+            throw new DuplicateResourceException(
+                "SKU already exists: " + request.sku());
+        }
+        Product product = mapper.toEntity(request);
+        return mapper.toResponse(repository.save(product));
+    }
+
+    @Transactional
+    public ProductResponse update(Long id, ProductRequest req) {
+        Product product = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(id));
+        try {
+            mapper.updateEntity(req, product);
+            return mapper.toResponse(repository.save(product));
+        } catch (ObjectOptimisticLockingFailureException e) {
+            throw new ConcurrentModificationException(id);
+        }
+    }
+
+    @Transactional
+    public void bulkUpdateQuantities(Map&lt;Long, Integer&gt; updates) {
+        log.info("Bulk updating {} products", updates.size());
+        updates.forEach((id, qty) -> repository.findById(id)
+                .ifPresent(p -> p.setQuantity(qty)));
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Java: Tests -->
+    <div id="java-tests" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Test Generation Prompts</h3>
+          <div class="space-y-3">
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">TDD Prompt</div>
+              <p class="text-sm text-gray-700">"Write JUnit 5 + Mockito tests for ProductService. Test all methods: happy path, not-found exception, duplicate SKU, optimistic lock failure, and bulk update with partial failures. Use @ExtendWith(MockitoExtension.class). Coverage target: 90%."</p>
+            </div>
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Integration Test</div>
+              <p class="text-sm text-gray-700">"Generate a @SpringBootTest integration test using Testcontainers with a real PostgreSQL container. Test the full HTTP request lifecycle for POST /api/products using MockMvc with proper JSON assertions."</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — Unit Test</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-java">@ExtendWith(MockitoExtension.class)
+class ProductServiceTest {
+
+    @Mock ProductRepository repository;
+    @Mock ProductMapper mapper;
+    @InjectMocks ProductService service;
+
+    @Test
+    @DisplayName("findBySku - returns response when found")
+    void findBySku_found() {
+        var product = new Product();
+        var response = new ProductResponse(1L, "SKU-001", "Widget", 10, 9.99, "Tools");
+        when(repository.findBySku("SKU-001"))
+                .thenReturn(Optional.of(product));
+        when(mapper.toResponse(product)).thenReturn(response);
+
+        var result = service.findBySku("SKU-001");
+
+        assertThat(result.sku()).isEqualTo("SKU-001");
+        verify(repository).findBySku("SKU-001");
+    }
+
+    @Test
+    @DisplayName("findBySku - throws when not found")
+    void findBySku_notFound() {
+        when(repository.findBySku(any())).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.findBySku("BAD-SKU"))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("BAD-SKU");
+    }
+
+    @Test
+    @DisplayName("create - throws on duplicate SKU")
+    void create_duplicateSku() {
+        when(repository.existsBySku("DUPE")).thenReturn(true);
+        var req = new ProductRequest("DUPE", "Widget", 5, 9.99, "Tools");
+        assertThatThrownBy(() -> service.create(req))
+                .isInstanceOf(DuplicateResourceException.class);
+        verify(repository, never()).save(any());
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Java: Security -->
+    <div id="java-security" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Security Prompts</h3>
+          <div class="space-y-3">
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Security Config</div>
+              <p class="text-sm text-gray-700">"Generate a Spring Security 6 SecurityFilterChain configuration with: JWT Bearer token authentication, stateless sessions, CORS configured for specific origins via environment variable, CSRF disabled for REST API, role-based access (ADMIN, USER, READONLY), actuator endpoints secured, and rate limiting via Bucket4j."</p>
+            </div>
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Security Review</div>
+              <p class="text-sm text-gray-700">"Review this controller code for OWASP Top 10 vulnerabilities. List each issue, its severity (Critical/High/Medium/Low), and the fix. [paste code]"</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — SecurityConfig</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-java">@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            JwtAuthFilter jwtFilter) throws Exception {
+        return http
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(s -> s.sessionCreationPolicy(STATELESS))
+            .cors(c -> c.configurationSource(corsSource()))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("USER","ADMIN","READONLY")
+                .requestMatchers(HttpMethod.POST, "/api/**").hasAnyRole("USER","ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+                .anyRequest().authenticated())
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(e -> e
+                .authenticationEntryPoint(new HttpStatusEntryPoint(UNAUTHORIZED))
+                .accessDeniedHandler((req, res, ex) ->
+                    res.sendError(HttpServletResponse.SC_FORBIDDEN)))
+            .build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsSource() {
+        var config = new CorsConfiguration();
+        config.setAllowedOrigins(
+            List.of(System.getenv("CORS_ORIGINS").split(",")));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        config.setMaxAge(3600L);
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", config);
+        return source;
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Java: Docker -->
+    <div id="java-docker" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Dockerfile Prompt</h3>
+          <div class="workflow-box mb-4">
+            <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Security-Hardened Container</div>
+            <p class="text-sm text-gray-700">"Generate a multi-stage Dockerfile for a Spring Boot 3.2 Maven application using Java 21. Requirements: Eclipse Temurin base image, non-root user, read-only filesystem, no shell, layered JAR extraction for cache efficiency, health check, and drop all Linux capabilities. Include a .dockerignore."</p>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — Multi-Stage Dockerfile</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-docker"># ── Build Stage ──────────────────────────────
+FROM eclipse-temurin:21-jdk-alpine AS build
+WORKDIR /build
+COPY mvnw pom.xml ./
+COPY .mvn .mvn
+RUN ./mvnw dependency:go-offline -q
+COPY src ./src
+RUN ./mvnw package -DskipTests -q && \
+    java -Djarmode=layertools \
+    -jar target/*.jar extract --destination target/extracted
+
+# ── Runtime Stage ─────────────────────────────
+FROM eclipse-temurin:21-jre-alpine AS runtime
+RUN addgroup -g 1001 appgroup && \
+    adduser -u 1001 -G appgroup -D appuser
+
+WORKDIR /app
+COPY --from=build --chown=appuser:appgroup \
+     /build/target/extracted/dependencies/ ./
+COPY --from=build --chown=appuser:appgroup \
+     /build/target/extracted/spring-boot-loader/ ./
+COPY --from=build --chown=appuser:appgroup \
+     /build/target/extracted/snapshot-dependencies/ ./
+COPY --from=build --chown=appuser:appgroup \
+     /build/target/extracted/application/ ./
+
+USER appuser
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s \
+  --start-period=30s --retries=3 \
+  CMD wget -qO- http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["java", \
+  "-XX:+UseContainerSupport", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "org.springframework.boot.loader.launch.JarLauncher"]</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── GOLANG WORKFLOW ─────────────────────────────── -->
+<section id="golang" class="py-16 px-6 bg-blue-50">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="w-2 h-8 bg-blue-600 block rounded-sm"></span>
+      <span class="text-blue-600 text-xs font-semibold uppercase tracking-widest">Chat Feature Workflow</span>
+    </div>
+    <h2 class="text-3xl font-bold text-gray-900 mb-2 ml-5">🐹 Golang Project Workflow</h2>
+    <p class="text-gray-500 ml-5 mb-8">Go 1.22 · Chi Router · sqlx · OpenTelemetry · Docker · GitHub Actions</p>
+
+    <div class="flex gap-0 border-b border-gray-200 mb-6 overflow-x-auto">
+      <button class="tab-btn active px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="go-scaffold">🏗️ Structure</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="go-handler">⚙️ Handlers</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="go-tests">🧪 Tests</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="go-grpc">📡 gRPC</button>
+    </div>
+
+    <!-- Go: Structure -->
+    <div id="go-scaffold" class="tab-content active">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Project Setup Prompts</h3>
+          <div class="space-y-3">
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Describe + Direct</div>
+              <p class="text-sm text-gray-700">"I'm building a Go 1.22 REST API for an order management service. Use Chi router, sqlx for PostgreSQL, zerolog for structured logging, viper for config, and OpenTelemetry for tracing. Generate go.mod and the directory structure following standard Go project layout (cmd/api, internal/handler, internal/service, internal/repository, internal/domain, pkg/middleware, config). Show me the tree."</p>
+            </div>
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Dialogue</div>
+              <p class="text-sm text-gray-700">"Generate cmd/api/main.go with: graceful shutdown (SIGTERM/SIGINT), dependency injection wiring, server with timeouts, and structured logging. Use errgroup for concurrent server startup with health check endpoint on a separate port."</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — main.go</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-go">package main
+
+import (
+	"context"
+	"net/http"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/rs/zerolog/log"
+	"golang.org/x/sync/errgroup"
+)
+
+func main() {
+	cfg := config.Load()
+	logger := logging.New(cfg.LogLevel)
+	db := database.Connect(cfg.Database)
+	defer db.Close()
+
+	// Wire dependencies
+	orderRepo := repository.NewOrderRepository(db)
+	orderSvc  := service.NewOrderService(orderRepo)
+	handler   := handler.NewOrderHandler(orderSvc, logger)
+
+	// Routers
+	router     := router.New(handler)
+	healthRtr  := router.NewHealth()
+
+	apiSrv := &http.Server{
+		Addr:         ":" + cfg.Port,
+		Handler:      router,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+	healthSrv := &http.Server{
+		Addr:    ":8081",
+		Handler: healthRtr,
+	}
+
+	ctx, stop := signal.NotifyContext(
+		context.Background(),
+		syscall.SIGTERM, syscall.SIGINT,
+	)
+	defer stop()
+
+	g, gCtx := errgroup.WithContext(ctx)
+	g.Go(func() error { return apiSrv.ListenAndServe() })
+	g.Go(func() error { return healthSrv.ListenAndServe() })
+	g.Go(func() error {
+		<-gCtx.Done()
+		log.Info().Msg("Shutting down...")
+		shutCtx, cancel := context.WithTimeout(
+			context.Background(), 30*time.Second)
+		defer cancel()
+		_ = apiSrv.Shutdown(shutCtx)
+		_ = healthSrv.Shutdown(shutCtx)
+		return nil
+	})
+	if err := g.Wait(); err != nil {
+		log.Fatal().Err(err).Msg("Server error")
+	}
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Go: Handlers -->
+    <div id="go-handler" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Handler Generation</h3>
+          <div class="workflow-box mb-3">
+            <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Full 4D Prompt</div>
+            <p class="text-sm text-gray-700">"Generate an OrderHandler struct with Chi router. Methods: GetOrder(w,r), CreateOrder(w,r), UpdateOrderStatus(w,r), ListOrders(w,r). Decode JSON bodies with validation using go-playground/validator. Return structured JSON errors. Add request ID logging via middleware. Inject OrderService interface (not concrete). Idiomatic Go — no OOP patterns."</p>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — Handler</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-go">type OrderHandler struct {
+	svc    service.OrderService
+	logger zerolog.Logger
+}
+
+func NewOrderHandler(svc service.OrderService,
+    logger zerolog.Logger) *OrderHandler {
+	return &OrderHandler{svc: svc, logger: logger}
+}
+
+func (h *OrderHandler) GetOrder(w http.ResponseWriter,
+    r *http.Request) {
+	id, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		respondError(w, http.StatusBadRequest,
+            "invalid order id")
+		return
+	}
+	order, err := h.svc.GetOrder(r.Context(), id)
+	if errors.Is(err, service.ErrNotFound) {
+		respondError(w, http.StatusNotFound,
+            "order not found")
+		return
+	}
+	if err != nil {
+		h.logger.Error().Err(err).Str("id",
+            id.String()).Msg("get order failed")
+		respondError(w, http.StatusInternalServerError,
+            "internal error")
+		return
+	}
+	respondJSON(w, http.StatusOK, order)
+}
+
+func (h *OrderHandler) CreateOrder(w http.ResponseWriter,
+    r *http.Request) {
+	var req CreateOrderRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondError(w, http.StatusBadRequest,
+            "invalid request body")
+		return
+	}
+	if err := validate.Struct(req); err != nil {
+		respondValidationError(w, err)
+		return
+	}
+	order, err := h.svc.CreateOrder(r.Context(), req)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("create order failed")
+		respondError(w, http.StatusInternalServerError,
+            "internal error")
+		return
+	}
+	respondJSON(w, http.StatusCreated, order)
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Go: Tests -->
+    <div id="go-tests" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Test Prompts</h3>
+          <div class="workflow-box mb-3">
+            <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Table-Driven Tests</div>
+            <p class="text-sm text-gray-700">"Write Go table-driven tests for OrderHandler.GetOrder using httptest.NewRecorder(). Test: 200 success, 400 bad UUID, 404 not found, 500 service error. Mock OrderService using an interface. Use testify/assert. Follow Go testing conventions."</p>
+          </div>
+          <div class="workflow-box">
+            <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Integration Test</div>
+            <p class="text-sm text-gray-700">"Write an integration test using testcontainers-go to spin up a PostgreSQL 16 container, run migrations, and test the full order creation flow through the real repository layer. No mocks."</p>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — Table Tests</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-go">func TestGetOrder(t *testing.T) {
+	orderID := uuid.New()
+	mockOrder := &domain.Order{
+		ID: orderID, Status: "PENDING",
+	}
+	tests := []struct {
+		name       string
+		urlParam   string
+		mockSetup  func(*mocks.OrderService)
+		wantStatus int
+	}{
+		{
+			name:     "success",
+			urlParam: orderID.String(),
+			mockSetup: func(m *mocks.OrderService) {
+				m.On("GetOrder", mock.Anything, orderID).
+					Return(mockOrder, nil)
+			},
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "invalid uuid",
+			urlParam:   "not-a-uuid",
+			mockSetup:  func(m *mocks.OrderService) {},
+			wantStatus: http.StatusBadRequest,
+		},
+		{
+			name:     "not found",
+			urlParam: uuid.New().String(),
+			mockSetup: func(m *mocks.OrderService) {
+				m.On("GetOrder", mock.Anything, mock.Anything).
+					Return(nil, service.ErrNotFound)
+			},
+			wantStatus: http.StatusNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockSvc := &mocks.OrderService{}
+			tt.mockSetup(mockSvc)
+			h := NewOrderHandler(mockSvc, zerolog.Nop())
+			rr := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet,
+				"/orders/"+tt.urlParam, nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", tt.urlParam)
+			req = req.WithContext(context.WithValue(
+				req.Context(), chi.RouteCtxKey, rctx))
+			h.GetOrder(rr, req)
+			assert.Equal(t, tt.wantStatus, rr.Code)
+		})
+	}
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Go: gRPC -->
+    <div id="go-grpc" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">gRPC Prompts</h3>
+          <div class="workflow-box mb-3">
+            <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Proto + Server</div>
+            <p class="text-sm text-gray-700">"Generate a protobuf v3 definition for an OrderService with RPCs: GetOrder, CreateOrder, ListOrders (server streaming), and WatchOrderStatus (bidirectional streaming). Then generate the Go gRPC server implementation with interceptors for: JWT auth, OpenTelemetry tracing, zerolog logging, and Prometheus metrics."</p>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — order.proto</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-protobuf">syntax = "proto3";
+package order.v1;
+option go_package = "github.com/company/orders/gen/order/v1;orderv1";
+
+import "google/protobuf/timestamp.proto";
+
+service OrderService {
+  rpc GetOrder(GetOrderRequest) returns (Order);
+  rpc CreateOrder(CreateOrderRequest) returns (Order);
+  rpc ListOrders(ListOrdersRequest) returns (stream Order);
+  rpc WatchOrderStatus(stream StatusUpdate)
+      returns (stream StatusUpdate);
+}
+
+message Order {
+  string id          = 1;
+  string customer_id = 2;
+  string status      = 3;
+  repeated OrderItem items = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message OrderItem {
+  string product_id = 1;
+  int32  quantity   = 2;
+  double unit_price = 3;
+}
+
+message GetOrderRequest    { string id = 1; }
+message ListOrdersRequest  {
+  string customer_id = 1;
+  int32  page_size   = 2;
+  string page_token  = 3;
+}
+message CreateOrderRequest {
+  string customer_id       = 1;
+  repeated OrderItem items = 2;
+}
+message StatusUpdate {
+  string order_id = 1;
+  string status   = 2;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DEVSECOPS ───────────────────────────────────── -->
+<section id="devsecops" class="py-16 px-6 bg-white">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="w-2 h-8 bg-blue-600 block rounded-sm"></span>
+      <span class="text-blue-600 text-xs font-semibold uppercase tracking-widest">Infrastructure &amp; Security</span>
+    </div>
+    <h2 class="text-3xl font-bold text-gray-900 mb-2 ml-5">🔒 DevSecOps Workflows</h2>
+    <p class="text-gray-500 ml-5 mb-8">Terraform · Kubernetes · Helm · CI/CD Pipelines · SAST/DAST</p>
+
+    <!-- Sub-tabs -->
+    <div class="flex gap-0 border-b border-gray-200 mb-6 overflow-x-auto">
+      <button class="tab-btn active px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="tf">🌍 Terraform</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="helm">⛵ Helm</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="k8s">☸️ Kubernetes</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="cicd">🚀 CI/CD Pipeline</button>
+      <button class="tab-btn px-5 py-2.5 text-sm font-medium whitespace-nowrap" data-tab="sast">🛡️ SAST/DAST</button>
+    </div>
+
+    <!-- Terraform -->
+    <div id="tf" class="tab-content active">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Terraform Chat Prompts</h3>
+          <div class="space-y-3">
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Describe + Security Requirements</div>
+              <p class="text-sm text-gray-700">"Generate Terraform 1.7 HCL for AWS EKS cluster. Requirements: private endpoint only, 3 node groups (system/app/spot), KMS encryption for etcd and EBS, VPC with private subnets only, no public IP on nodes, AWS SSM for node access instead of SSH, IRSA for pod IAM, and enable control plane logging for all types. Use variables and outputs. Follow CIS AWS Foundations Benchmark."</p>
+            </div>
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Dialogue — Tfsec Review</div>
+              <p class="text-sm text-gray-700">"Review this Terraform module for security misconfigurations. List issues in a table: Resource | Issue | Severity | Fix. Then provide the corrected HCL. [paste module]"</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — EKS Terraform Module</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-hcl">module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 20.0"
+
+  cluster_name    = var.cluster_name
+  cluster_version = "1.29"
+
+  # Private endpoint only
+  cluster_endpoint_public_access  = false
+  cluster_endpoint_private_access = true
+
+  # KMS encryption
+  cluster_encryption_config = {
+    provider_key_arn = aws_kms_key.eks.arn
+    resources        = ["secrets"]
+  }
+
+  # Enable all control plane logging
+  cluster_enabled_log_types = [
+    "api", "audit", "authenticator",
+    "controllerManager", "scheduler"
+  ]
+
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
+
+  # IRSA
+  enable_irsa = true
+
+  eks_managed_node_groups = {
+    system = {
+      instance_types = ["m5.large"]
+      min_size  = 2; max_size  = 3; desired_size = 2
+      labels    = { role = "system" }
+      taints    = [{ key = "CriticalAddonsOnly"
+                     value = "true"; effect = "NO_SCHEDULE" }]
+      metadata_options = {
+        http_endpoint               = "enabled"
+        http_tokens                 = "required"  # IMDSv2
+        http_put_response_hop_limit = 1
+      }
+    }
+    app = {
+      instance_types = ["m5.xlarge", "m5.2xlarge"]
+      min_size  = 2; max_size  = 10; desired_size = 3
+      metadata_options = { http_tokens = "required"
+                           http_put_response_hop_limit = 1 }
+    }
+    spot = {
+      capacity_type  = "SPOT"
+      instance_types = ["m5.xlarge", "m5a.xlarge", "m4.xlarge"]
+      min_size  = 0; max_size  = 10; desired_size = 0
+    }
+  }
+
+  tags = var.tags
+}
+
+resource "aws_kms_key" "eks" {
+  description             = "EKS secrets encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  tags                    = var.tags
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Helm -->
+    <div id="helm" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Helm Chart Prompts</h3>
+          <div class="workflow-box mb-3">
+            <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Security-Hardened Chart</div>
+            <p class="text-sm text-gray-700">"Generate a production Helm chart for a Spring Boot API called 'inventory-api'. Include: Deployment with security context (non-root, read-only root fs, drop all caps, no privilege escalation), HPA (CPU + memory), PodDisruptionBudget, NetworkPolicy (ingress only from nginx ingress + Prometheus, egress only to postgres and external APIs), ServiceAccount with IRSA annotation, ConfigMap + ExternalSecret (AWS Secrets Manager), and ServiceMonitor for Prometheus. Values should be parameterized."</p>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — deployment.yaml</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "inventory-api.fullname" . }}
+  labels: {{ include "inventory-api.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: {{ include "inventory-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port:   "{{ .Values.metrics.port }}"
+      labels: {{ include "inventory-api.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "inventory-api.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser:    1001
+        runAsGroup:   1001
+        fsGroup:      1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem:   true
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "inventory-api.fullname" . }}
+            - secretRef:
+                name: {{ include "inventory-api.fullname" . }}-secrets
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 5
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels: {{ include "inventory-api.selectorLabels" . | nindent 14 }}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- K8s -->
+    <div id="k8s" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">K8s Manifest Prompts</h3>
+          <div class="workflow-box mb-3">
+            <div class="text-xs text-blue-500 font-semibold uppercase mb-1">NetworkPolicy Prompt</div>
+            <p class="text-sm text-gray-700">"Generate Kubernetes NetworkPolicy manifests for a 3-tier app: frontend (React, port 3000), backend API (port 8080), and PostgreSQL (port 5432). Rules: frontend → backend only; backend → postgres only; ingress-nginx → frontend; monitoring namespace → scrape all pods on metrics port. Default deny all. Label-based selectors."</p>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — NetworkPolicy</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-yaml"># Default deny all ingress/egress
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: production
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+# Backend API policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-api
+  namespace: production
+spec:
+  podSelector:
+    matchLabels: { app: backend-api }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: frontend }
+      ports:
+        - port: 8080
+    - from:
+        - namespaceSelector:
+            matchLabels: { name: monitoring }
+      ports:
+        - port: 9090  # metrics
+  egress:
+    - to:
+        - podSelector:
+            matchLabels: { app: postgresql }
+      ports:
+        - port: 5432
+    - to:          # Allow DNS
+        - namespaceSelector: {}
+      ports:
+        - port: 53; protocol: UDP
+        - port: 53; protocol: TCP
+---
+# PostgreSQL - only from backend
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgresql
+  namespace: production
+spec:
+  podSelector:
+    matchLabels: { app: postgresql }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: backend-api }
+      ports:
+        - port: 5432</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CI/CD -->
+    <div id="cicd" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Pipeline Prompts</h3>
+          <div class="space-y-3">
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Full Pipeline Request</div>
+              <p class="text-sm text-gray-700">"Generate a GitHub Actions workflow for a Spring Boot app. Stages: 1) Test (unit + integration with Testcontainers), 2) SAST with Semgrep + dependency scan with Trivy, 3) Build &amp; push Docker image to ECR with SBOM generation, 4) Scan image with Trivy (fail on CRITICAL), 5) Deploy to EKS via Helm with blue/green using Argo Rollouts, 6) Smoke test. Use OIDC for AWS auth (no static creds). Parallel jobs where possible."</p>
+            </div>
+          </div>
+
+          <!-- CI/CD Flow Diagram -->
+          <div class="mt-4 bg-blue-900 rounded-sm p-4 text-white text-xs">
+            <div class="text-blue-300 font-semibold mb-3 uppercase tracking-wider">Pipeline Flow</div>
+            <div class="space-y-2">
+              <div class="flex items-center gap-2">
+                <span class="bg-blue-600 px-2 py-1 rounded-sm">Push/PR</span>
+                <span class="text-blue-300">→</span>
+                <span class="bg-blue-700 px-2 py-1 rounded-sm">Unit Tests</span>
+                <span class="text-blue-300">‖</span>
+                <span class="bg-blue-700 px-2 py-1 rounded-sm">SAST Scan</span>
+              </div>
+              <div class="flex items-center gap-2 ml-4">
+                <span class="text-blue-300">↓</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="bg-blue-600 px-2 py-1 rounded-sm">Build Image</span>
+                <span class="text-blue-300">→</span>
+                <span class="bg-blue-700 px-2 py-1 rounded-sm">Image Scan</span>
+                <span class="text-blue-300">→</span>
+                <span class="bg-blue-700 px-2 py-1 rounded-sm">Push ECR</span>
+              </div>
+              <div class="flex items-center gap-2 ml-4">
+                <span class="text-blue-300">↓</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="bg-green-700 px-2 py-1 rounded-sm">Helm Deploy</span>
+                <span class="text-blue-300">→</span>
+                <span class="bg-green-700 px-2 py-1 rounded-sm">Smoke Test</span>
+                <span class="text-blue-300">→</span>
+                <span class="bg-green-600 px-2 py-1 rounded-sm">✅ Live</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Sample — GitHub Actions</h3>
+          <div class="code-wrap relative">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre class="rounded-sm text-xs overflow-x-auto"><code class="language-yaml">name: Build, Scan & Deploy
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents:      read
+  id-token:      write   # OIDC
+  packages:      write
+  security-events: write
+
+env:
+  ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+  IMAGE_NAME:   inventory-api
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { java-version: '21', distribution: 'temurin' }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+      - run: ./mvnw verify -P integration-tests
+
+  sast:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep SAST
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: p/owasp-top-ten p/java p/secrets
+      - name: Dependency scan
+        run: |
+          ./mvnw dependency-check:check \
+            -DfailBuildOnCVSS=7
+      - uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          format: sarif
+          output: trivy-fs.sarif
+      - uses: github/codeql-action/upload-sarif@v3
+        with: { sarif_file: trivy-fs.sarif }
+
+  build-push:
+    runs-on: ubuntu-latest
+    needs: [test, sast]
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      digest:    ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region:     us-east-1
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Build & push with SBOM
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          provenance: true
+          sbom: true
+          cache-from: type=gha
+          cache-to:   type=gha,mode=max
+
+  image-scan:
+    runs-on: ubuntu-latest
+    needs: build-push
+    steps:
+      - uses: aquasecurity/trivy-action@master
+        with:
+          image-ref:  ${{ needs.build-push.outputs.image-tag }}
+          format:     sarif
+          output:     trivy-image.sarif
+          severity:   CRITICAL,HIGH
+          exit-code:  1
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: image-scan
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region:     us-east-1
+      - run: aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER }}
+      - name: Helm upgrade
+        run: |
+          helm upgrade --install inventory-api ./charts/inventory-api \
+            --namespace production \
+            --set image.tag=${{ github.sha }} \
+            --set image.repository=${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }} \
+            --wait --timeout=5m \
+            --atomic</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAST/DAST -->
+    <div id="sast" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">Security Scanning Prompts</h3>
+          <div class="space-y-3">
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">SAST Config</div>
+              <p class="text-sm text-gray-700">"Generate a Semgrep ruleset configuration for a Java Spring Boot app. Include rules for: SQL injection, XXE, path traversal, SSRF, insecure deserialization, hardcoded credentials, and JWT misconfigurations. Use semgrep.dev OSS rules plus custom rules for our codebase patterns."</p>
+            </div>
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">DAST with OWASP ZAP</div>
+              <p class="text-sm text-gray-700">"Write a GitHub Actions job using OWASP ZAP for DAST against our staging API. Run active scan against /api/* endpoints. Fail the build if any CRITICAL or HIGH alerts are found. Output results as HTML report artifact and post a summary comment on the PR."</p>
+            </div>
+            <div class="workflow-box">
+              <div class="text-xs text-blue-500 font-semibold uppercase mb-1">Vulnerability Review</div>
+              <p class="text-sm text-gray-700">"Trivy found CVE-2024-XXXX in library X at version Y. Explain the vulnerability, its exploitability in a containerized Spring Boot app, and provide: 1) immediate mitigation, 2) upgrade path, 3) compensating controls if upgrade isn't possible."</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-3">DevSecOps Security Gates</h3>
+          <div class="space-y-3">
+            <div class="bg-red-50 border border-red-200 rounded-sm p-4">
+              <div class="font-bold text-red-700 text-sm mb-2">🚫 BLOCK (Fail Build)</div>
+              <ul class="text-xs text-gray-700 space-y-1">
+                <li>▸ Critical CVEs (CVSS ≥ 9.0) in base image</li>
+                <li>▸ Secrets detected in code or image layers</li>
+                <li>▸ SAST Critical findings (SQL injection, RCE)</li>
+                <li>▸ Running as root in container</li>
+                <li>▸ DAST Critical/High alerts</li>
+              </ul>
+            </div>
+            <div class="bg-yellow-50 border border-yellow-200 rounded-sm p-4">
+              <div class="font-bold text-yellow-700 text-sm mb-2">⚠️ WARN (PR Comment)</div>
+              <ul class="text-xs text-gray-700 space-y-1">
+                <li>▸ High CVEs (CVSS 7.0–8.9) — must be triaged</li>
+                <li>▸ Deprecated dependencies</li>
+                <li>▸ Missing security headers</li>
+                <li>▸ SAST Medium findings</li>
+              </ul>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-sm p-4">
+              <div class="font-bold text-green-700 text-sm mb-2">✅ GATE (Required to Pass)</div>
+              <ul class="text-xs text-gray-700 space-y-1">
+                <li>▸ SBOM generated and signed (cosign)</li>
+                <li>▸ Image provenance attestation</li>
+                <li>▸ All unit tests pass ≥ 80% coverage</li>
+                <li>▸ License compliance check clean</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROMPT LIBRARY ──────────────────────────────── -->
+<section id="prompts" class="py-16 px-6 bg-blue-900 text-white">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="w-2 h-8 bg-blue-400 block rounded-sm"></span>
+      <span class="text-blue-300 text-xs font-semibold uppercase tracking-widest">Quick Reference</span>
+    </div>
+    <h2 class="text-3xl font-bold text-white mb-8 ml-5">⚡ Prompt Template Library</h2>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Card pattern repeated -->
+      <div id="prompt-cards"></div>
+    </div>
+
+    <div id="prompt-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </div>
+</section>
+
+<!-- ── ACCORDION: QUICK TIPS ──────────────────────── -->
+<section class="py-12 px-6 bg-white">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="w-2 h-8 bg-blue-600 block rounded-sm"></span>
+      <span class="text-blue-600 text-xs font-semibold uppercase tracking-widest">FAQ &amp; Tips</span>
+    </div>
+    <h2 class="text-2xl font-bold text-gray-900 mb-6 ml-5">Common Questions</h2>
+    <div id="accordion" class="space-y-2"></div>
+  </div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────────── -->
+<footer class="bg-blue-950 text-blue-300 py-10 px-6 border-t border-blue-800">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid md:grid-cols-3 gap-8 mb-8">
+      <div>
+        <div class="text-white font-bold text-lg mb-2">AI Dev &amp; DevSecOps Guide</div>
+        <p class="text-sm text-blue-400">Built using Anthropic AI Fluency principles. Designed in IBM Carbon Design System aesthetic.</p>
+      </div>
+      <div>
+        <div class="text-white font-semibold mb-2 text-sm uppercase tracking-wide">Topics</div>
+        <ul class="text-sm space-y-1">
+          <li><a href="#fluency" class="hover:text-white transition">AI Fluency &amp; 4 Ds</a></li>
+          <li><a href="#java" class="hover:text-white transition">Java Spring Boot</a></li>
+          <li><a href="#golang" class="hover:text-white transition">Golang APIs &amp; gRPC</a></li>
+          <li><a href="#devsecops" class="hover:text-white transition">DevSecOps &amp; CI/CD</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-white font-semibold mb-2 text-sm uppercase tracking-wide">Technologies</div>
+        <div class="flex flex-wrap gap-2 text-xs">
+          <span class="bg-blue-800 px-2 py-1 rounded-sm">Terraform</span>
+          <span class="bg-blue-800 px-2 py-1 rounded-sm">Kubernetes</span>
+          <span class="bg-blue-800 px-2 py-1 rounded-sm">Helm</span>
+          <span class="bg-blue-800 px-2 py-1 rounded-sm">GitHub Actions</span>
+          <span class="bg-blue-800 px-2 py-1 rounded-sm">Trivy</span>
+          <span class="bg-blue-800 px-2 py-1 rounded-sm">Semgrep</span>
+          <span class="bg-blue-800 px-2 py-1 rounded-sm">Spring Boot 3</span>
+          <span class="bg-blue-800 px-2 py-1 rounded-sm">Go 1.22</span>
+        </div>
+      </div>
+    </div>
+    <hr class="border-blue-800 mb-4"/>
+    <div class="text-xs text-blue-500 text-center">Anthropic AI Fluency Framework · IBM Carbon Design Inspired · 2024–2025</div>
+  </div>
+</footer>
+
+<script>
+// ── Highlight.js ────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+});
+
+// ── Tab System ──────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    // Scope to parent section
+    const section = btn.closest('section');
+    section.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    section.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    const target = document.getElementById(tab);
+    if (target) {
+      target.classList.add('active');
+      target.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+    }
+  });
+});
+
+// ── Mobile Menu ─────────────────────────────────────
+document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+  document.getElementById('mobileMenu').classList.toggle('hidden');
+});
+
+// ── Copy Code ────────────────────────────────────────
+function copyCode(btn) {
+  const code = btn.nextElementSibling.querySelector('code');
+  navigator.clipboard.writeText(code.innerText).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+}
+
+// ── Prompt Library ───────────────────────────────────
+const prompts = [
+  {
+    icon: '☕', tag: 'Java', color: 'blue',
+    title: 'Spring Boot Service',
+    text: 'Act as a senior Java developer. Generate a @Service class for [domain] using Spring Boot 3.2, JPA, and [repo interface]. Include @Transactional, SLF4J logging, custom exception handling, and pagination. Return [Response DTO]. No Lombok.'
+  },
+  {
+    icon: '🐹', tag: 'Golang', color: 'cyan',
+    title: 'Go HTTP Handler',
+    text: 'Generate a Go 1.22 HTTP handler for [resource] using Chi router. Include JSON decoding with go-playground/validator, structured error responses, request ID logging via middleware, and interface-based service injection. Idiomatic Go.'
+  },
+  {
+    icon: '🧪', tag: 'Testing', color: 'purple',
+    title: 'Unit Test Generator',
+    text: 'Write [JUnit5/Go table-driven] tests for the following code. Test: happy path, all error conditions, boundary values, and concurrent access. Mock all external dependencies. Target 90% branch coverage. [paste code here]'
+  },
+  {
+    icon: '🔒', tag: 'Security', color: 'red',
+    title: 'Security Code Review',
+    text: 'Review this code for OWASP Top 10 vulnerabilities. Output a table: Vulnerability | Location | Severity (Critical/High/Medium/Low) | CVSS Score | Remediation. Then provide the fixed code with comments explaining each change. [paste code]'
+  },
+  {
+    icon: '🌍', tag: 'Terraform', color: 'violet',
+    title: 'Secure AWS Module',
+    text: 'Generate Terraform 1.7 HCL for [AWS resource]. Requirements: CIS Benchmark compliance, KMS encryption at rest, no public access, least-privilege IAM, CloudWatch logging, resource tagging policy. Use variables for all configurable values. Output: main.tf, variables.tf, outputs.tf.'
+  },
+  {
+    icon: '⛵', tag: 'Helm', color: 'blue',
+    title: 'Production Helm Chart',
+    text: 'Generate a Kubernetes Helm chart for [app name] running on port [port]. Include: Deployment with security context (non-root, read-only fs, drop ALL caps), HPA, PDB, NetworkPolicy, ServiceMonitor, ExternalSecret, and IRSA ServiceAccount. Values parameterized.'
+  },
+  {
+    icon: '🚀', tag: 'CI/CD', color: 'green',
+    title: 'GitHub Actions Pipeline',
+    text: 'Create a GitHub Actions workflow for a [Java/Go] app with: parallel test + SAST jobs, Docker build with SBOM, Trivy image scan (fail on CRITICAL), push to ECR via OIDC, Helm deploy to EKS, and smoke test. No hardcoded credentials.'
+  },
+  {
+    icon: '🐳', tag: 'Docker', color: 'sky',
+    title: 'Hardened Dockerfile',
+    text: 'Generate a multi-stage Dockerfile for [app/language]. Requirements: minimal base image, non-root user (UID 1001), read-only root filesystem, no shell, layered build for cache, health check endpoint, drop all Linux capabilities. Include .dockerignore.'
+  },
+  {
+    icon: '🔍', tag: 'Debug', color: 'orange',
+    title: 'Debug Assistant',
+    text: 'I have a [Java/Go] application throwing: [paste full stack trace]. Environment: [describe env]. I have already tried: [what you tried]. Analyze the root cause step by step, identify the exact line(s) responsible, and provide a fix with explanation.'
+  },
+];
+
+const colorMap = {
+  blue: 'bg-blue-600', cyan: 'bg-cyan-600', purple: 'bg-purple-600',
+  red: 'bg-red-600', violet: 'bg-violet-600', green: 'bg-green-600',
+  sky: 'bg-sky-500', orange: 'bg-orange-500'
+};
+
+const grid = document.getElementById('prompt-grid');
+prompts.forEach(p => {
+  const card = document.createElement('div');
+  card.className = 'bg-blue-800 border border-blue-700 rounded-sm p-4 card-hover cursor-pointer group';
+  card.innerHTML = `
+    <div class="flex items-center gap-2 mb-2">
+      <span class="text-xl">${p.icon}</span>
+      <span class="text-xs font-semibold uppercase tracking-wider ${colorMap[p.color] || 'bg-blue-600'} text-white px-2 py-0.5 rounded-sm">${p.tag}</span>
+    </div>
+    <h4 class="text-white font-bold text-sm mb-2">${p.title}</h4>
+    <p class="text-blue-200 text-xs leading-relaxed line-clamp-3">${p.text}</p>
+    <button class="mt-3 text-xs text-blue-400 hover:text-white transition flex items-center gap-1 copy-prompt-btn">
+      📋 Copy Template
+    </button>
+  `;
+  card.querySelector('.copy-prompt-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(p.text).then(() => {
+      const btn = card.querySelector('.copy-prompt-btn');
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => btn.innerHTML = '📋 Copy Template', 1500);
+    });
+  });
+  grid.appendChild(card);
+});
+
+// ── Accordion ─────────────────────────────────────────
+const faqs = [
+  {
+    q: 'How do I get the best code quality from AI chat?',
+    a: 'Provide maximum context upfront: language/framework versions, existing patterns, non-functional requirements, and team conventions. Paste relevant code snippets when asking for refactoring or debugging. Then iterate with follow-up questions. Think of it as pair programming — the more context your "partner" has, the better the collaboration.'
+  },
+  {
+    q: 'What security risks should I watch for with AI-generated code?',
+    a: 'Key risks include: insecure default configurations (no encryption, public access), missing input validation, hardcoded secrets, SQL injection via string concatenation, overly permissive IAM roles, and missing error handling that leaks stack traces. Always run SAST tools (Semgrep, CodeQL) on AI-generated code before merging. Explicitly ask for security-focused variants of your prompts.'
+  },
+  {
+    q: 'How do I use AI for Terraform without creating security gaps?',
+    a: 'Always specify security requirements explicitly in your Terraform prompts: "No public access", "KMS encryption required", "Least-privilege IAM", "Enable CloudTrail logging". After generation, run tfsec or Checkov to catch misconfigurations. Use AI to also explain what each resource does so you can validate it against your intended architecture.'
+  },
+  {
+    q: 'Can I use AI to review Kubernetes manifests for security issues?',
+    a: 'Yes, this is one of the best use cases. Prompt: "Review this Kubernetes manifest for security issues. Check: non-root user enforcement, read-only root filesystem, dropped capabilities, resource limits, no hostNetwork/hostPID, NetworkPolicy exists, no privileged containers, seccompProfile set. Table format: Issue | Severity | Fix." Then ask it to output the corrected manifest.'
+  },
+  {
+    q: 'How should I split tasks when building a microservice with AI?',
+    a: 'Use the following sequence: 1) Project structure + pom.xml/go.mod, 2) Domain models + DTOs, 3) Repository layer + DB schema, 4) Service layer (write tests first, then impl), 5) Controller/Handler layer, 6) Security config, 7) Dockerfile, 8) Helm chart, 9) CI/CD pipeline. Each step is its own conversation thread with full context of previous outputs pasted in.'
+  },
+  {
+    q: 'How do I use AI to help with a CI/CD pipeline I don\'t understand?',
+    a: 'Start with: "Explain this CI/CD pipeline step by step. What does each job do, what are the security controls, and what would happen if X failed? [paste pipeline YAML]". Then ask: "What improvements would make this more secure and faster?" Then: "Now rewrite the pipeline with your suggested improvements, explaining what changed." This dialogue approach teaches you while improving the code.'
+  },
+];
+
+const accordion = document.getElementById('accordion');
+faqs.forEach((faq, i) => {
+  const item = document.createElement('div');
+  item.className = 'border border-gray-200 rounded-sm';
+  item.innerHTML = `
+    <button class="w-full text-left px-5 py-4 flex justify-between items-center hover:bg-blue-50 transition font-medium text-gray-800 text-sm">
+      ${faq.q}
+      <span class="accordion-icon text-blue-600 text-xl ml-4 flex-shrink-0">+</span>
+    </button>
+    <div class="accordion-body px-5 text-sm text-gray-600 leading-relaxed">
+      <div class="pb-4 pt-1">${faq.a}</div>
+    </div>
+  `;
+  const btn = item.querySelector('button');
+  const body = item.querySelector('.accordion-body');
+  const icon = item.querySelector('.accordion-icon');
+  btn.addEventListener('click', () => {
+    body.classList.toggle('open');
+    icon.classList.toggle('open');
+  });
+  accordion.appendChild(item);
+});
+
+// ── Scroll-spy active nav ────────────────────────────
+const sections = ['fluency','bestpractices','java','golang','devsecops','prompts'];
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY + 80;
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.offsetTop <= scrollY && el.offsetTop + el.offsetHeight > scrollY) {
+      document.querySelectorAll('.nav-link').forEach(a => {
+        a.style.color = '';
+        if (a.getAttribute('href') === '#' + id) a.style.color = '#78a9ff';
+      });
+    }
+  });
+});
+</script>
+</body>
+</html>

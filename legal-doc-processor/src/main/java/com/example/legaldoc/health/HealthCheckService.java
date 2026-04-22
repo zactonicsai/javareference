@@ -34,7 +34,7 @@ public class HealthCheckService {
     private boolean isTemporalAvailable() {
         try {
             workflowServiceStubs.blockingStub()
-                    .getSystemInfo(io.temporal.api.workflowservice.v1.GetSystemInfoRequest.newBuilder().build());
+                    .getClusterInfo(io.temporal.api.workflowservice.v1.GetClusterInfoRequest.newBuilder().build());
             return true;
         } catch (Exception e) {
             log.debug("Temporal unavailable: {}", e.getMessage());

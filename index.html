@@ -1,273 +1,146 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Java 21 Builder Pattern Tutorial</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<script>
-tailwind.config = {
-  darkMode: 'class'
-}
-</script>
-
-<style>
-.modal { display:none; }
-.modal.active { display:flex; }
-</style>
-</head>
-
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-
-<div class="p-6 max-w-6xl mx-auto">
-
-<!-- HEADER -->
-<div class="flex justify-between items-center mb-6">
-  <h1 class="text-3xl font-bold">Java 21 Builder Pattern Tutorial</h1>
-  <button onclick="toggleDark()" class="px-3 py-1 bg-gray-800 text-white rounded">Toggle Dark</button>
-</div>
-
-<!-- INTRO -->
-<div class="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6">
-  <h2 class="text-xl font-semibold mb-2">What You Will Learn</h2>
-  <ul class="list-disc ml-6">
-    <li>Builder Pattern (Java 21 style)</li>
-    <li>DTO design</li>
-    <li>Service layer processing</li>
-    <li>Controller flow</li>
-    <li>Simulated Document Ingestion</li>
-  </ul>
-
-  <button onclick="openModal('summary')" class="mt-3 text-blue-500 underline">
-    View Summary
-  </button>
-</div>
-
-<!-- STEP 1 -->
-<div class="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6">
-  <h2 class="text-xl font-semibold">Step 1: DTO with Builder</h2>
-
-<pre class="bg-black text-green-400 p-3 rounded overflow-auto text-sm">
-public class DocumentDTO {
-    private final String id;
-    private final String name;
-    private final String content;
-
-    private DocumentDTO(Builder builder) {
-        this.id = builder.id;
-        this.name = builder.name;
-        this.content = builder.content;
-    }
-
-    public static class Builder {
-        private String id;
-        private String name;
-        private String content;
-
-        public Builder id(String id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder content(String content) {
-            this.content = content;
-            return this;
-        }
-
-        public DocumentDTO build() {
-            return new DocumentDTO(this);
-        }
-    }
-}
-</pre>
-
-  <button onclick="openModal('dto')" class="text-blue-500 underline mt-2">Explain DTO</button>
-</div>
-
-<!-- STEP 2 -->
-<div class="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6">
-  <h2 class="text-xl font-semibold">Step 2: Service Layer</h2>
-
-<pre class="bg-black text-green-400 p-3 rounded text-sm">
-@Service
-public class DocumentService {
-
-    public DocumentDTO ingest(String name, String content) {
-        return new DocumentDTO.Builder()
-                .id(UUID.randomUUID().toString())
-                .name(name)
-                .content(content)
-                .build();
-    }
-}
-</pre>
-
-  <button onclick="openModal('service')" class="text-blue-500 underline mt-2">Explain Service</button>
-</div>
-
-<!-- STEP 3 -->
-<div class="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6">
-  <h2 class="text-xl font-semibold">Step 3: Controller</h2>
-
-<pre class="bg-black text-green-400 p-3 rounded text-sm">
-@RestController
-@RequestMapping("/docs")
-public class DocumentController {
-
-    private final DocumentService service;
-
-    public DocumentController(DocumentService service) {
-        this.service = service;
-    }
-
-    @PostMapping("/ingest")
-    public DocumentDTO ingest(@RequestBody Map&lt;String,String&gt; req) {
-        return service.ingest(req.get("name"), req.get("content"));
-    }
-}
-</pre>
-
-  <button onclick="openModal('controller')" class="text-blue-500 underline mt-2">Explain Controller</button>
-</div>
-
-<!-- STEP 4 UI -->
-<div class="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6">
-  <h2 class="text-xl font-semibold">Step 4: Simulate Document Ingestion</h2>
-
-  <input id="docName" placeholder="Document Name"
-    class="border p-2 w-full mb-2 text-black">
-
-  <textarea id="docContent" placeholder="Content"
-    class="border p-2 w-full mb-2 text-black"></textarea>
-
-  <button onclick="ingestDoc()"
-    class="bg-blue-600 text-white px-4 py-2 rounded">
-    Ingest Document
-  </button>
-
-  <div id="output" class="mt-4"></div>
-</div>
-
-<!-- DOC LINKS -->
-<div class="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6">
-  <h2 class="text-xl font-semibold">Official Docs</h2>
-
-  <ul class="list-disc ml-6">
-    <li>
-      <a href="https://docs.oracle.com/en/java/javase/21/" target="_blank"
-        class="text-blue-500 underline">Java 21 Docs</a>
-    </li>
-    <li>
-      <a href="https://spring.io/projects/spring-boot" target="_blank"
-        class="text-blue-500 underline">Spring Boot</a>
-    </li>
-    <li>
-      <a href="https://refactoring.guru/design-patterns/builder"
-        target="_blank"
-        class="text-blue-500 underline">Builder Pattern</a>
-    </li>
-  </ul>
-</div>
-
-</div>
-
-<!-- MODALS -->
-
-<div id="summary" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
-<div class="bg-white p-6 rounded max-w-lg">
-<h2 class="text-xl font-bold mb-2">Summary</h2>
-<p>
-Builder Pattern helps construct complex objects step-by-step.
-It improves readability, immutability, and flexibility.
-Used heavily in enterprise apps for DTO creation.
-</p>
-<button onclick="closeModal('summary')" class="mt-4 bg-blue-500 text-white px-3 py-1 rounded">Close</button>
-</div>
-</div>
-
-<div id="dto" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
-<div class="bg-white p-6 rounded max-w-lg">
-<h2 class="text-xl font-bold">DTO Explanation</h2>
-<p>
-DTO holds data only. Builder allows safe object creation without large constructors.
-</p>
-<button onclick="closeModal('dto')" class="mt-4 bg-blue-500 text-white px-3 py-1 rounded">Close</button>
-</div>
-</div>
-
-<div id="service" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
-<div class="bg-white p-6 rounded max-w-lg">
-<h2 class="text-xl font-bold">Service Explanation</h2>
-<p>
-Service layer contains business logic. Builder is used here to construct DTO safely.
-</p>
-<button onclick="closeModal('service')" class="mt-4 bg-blue-500 text-white px-3 py-1 rounded">Close</button>
-</div>
-</div>
-
-<div id="controller" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
-<div class="bg-white p-6 rounded max-w-lg">
-<h2 class="text-xl font-bold">Controller Explanation</h2>
-<p>
-Controller handles HTTP requests and delegates to service.
-</p>
-<button onclick="closeModal('controller')" class="mt-4 bg-blue-500 text-white px-3 py-1 rounded">Close</button>
-</div>
-</div>
-
-<script>
-function toggleDark() {
-  document.documentElement.classList.toggle('dark');
-}
-
-function openModal(id) {
-  document.getElementById(id).classList.add('active');
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('active');
-}
-
-function ingestDoc() {
-  const name = document.getElementById('docName').value;
-  const content = document.getElementById('docContent').value;
-
-  const doc = {
-    id: crypto.randomUUID(),
-    name,
-    content
-  };
-
-  let docs = JSON.parse(localStorage.getItem('docs') || '[]');
-  docs.push(doc);
-  localStorage.setItem('docs', JSON.stringify(docs));
-
-  renderDocs();
-}
-
-function renderDocs() {
-  let docs = JSON.parse(localStorage.getItem('docs') || '[]');
-
-  let html = docs.map(d => `
-    <div class="border p-2 mb-2 rounded">
-      <strong>${d.name}</strong><br/>
-      ID: ${d.id}<br/>
-      Content: ${d.content}
+<!-- STEP: VALIDATION + LOMBOK -->
+<section id="validation-lombok" class="bg-white dark:bg-slate-900 rounded-2xl shadow-soft p-6 border border-slate-200 dark:border-slate-800">
+  
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-bold">7. Jakarta Validation & Lombok Best Practices</h2>
+      <p class="mt-3 leading-7">
+        In real applications, you should validate incoming data and reduce boilerplate code.
+        This is where <strong>Jakarta Validation</strong> and <strong>Lombok</strong> come in.
+      </p>
     </div>
-  `).join("");
+    <button onclick="openModal('validationModal')" class="px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-500">
+      Deep Dive
+    </button>
+  </div>
 
-  document.getElementById('output').innerHTML = html;
+  <!-- JAKARTA VALIDATION -->
+  <div class="mt-6">
+    <h3 class="text-xl font-bold mb-3">Jakarta Validation (Request Validation)</h3>
+
+<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto">
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record DocumentIngestionRequest(
+
+    @NotBlank(message = "File name is required")
+    String fileName,
+
+    @Size(min = 5, max = 5000, message = "Content must be between 5 and 5000 chars")
+    String content,
+
+    String geoTag
+
+) { }
+</pre>
+
+    <p class="mt-3 text-sm">
+      This ensures invalid requests are rejected before reaching business logic.
+    </p>
+  </div>
+
+  <!-- CONTROLLER VALIDATION -->
+  <div class="mt-6">
+    <h3 class="text-xl font-bold mb-3">Controller with Validation</h3>
+
+<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto">
+@PostMapping("/ingest")
+public DocumentIngestionResponse ingest(
+    @Valid @RequestBody DocumentIngestionRequest request
+) {
+    return documentIngestionService.ingest(request);
 }
+</pre>
 
-renderDocs();
-</script>
+    <p class="mt-3 text-sm">
+      <strong>@Valid</strong> triggers validation automatically.
+    </p>
+  </div>
 
-</body>
-</html>
+  <!-- ERROR HANDLING -->
+  <div class="mt-6">
+    <h3 class="text-xl font-bold mb-3">Validation Error Handling</h3>
+
+<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto">
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map&lt;String, String&gt; handleValidationErrors(
+            MethodArgumentNotValidException ex) {
+
+        Map&lt;String, String&gt; errors = new HashMap<>();
+
+        ex.getBindingResult().getFieldErrors()
+          .forEach(error ->
+              errors.put(error.getField(), error.getDefaultMessage())
+          );
+
+        return errors;
+    }
+}
+</pre>
+
+  </div>
+
+  <!-- LOMBOK -->
+  <div class="mt-8">
+    <h3 class="text-xl font-bold mb-3">Lombok Builder Alternative</h3>
+
+<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-auto">
+import lombok.Builder;
+import lombok.Value;
+
+@Value
+@Builder
+public class DocumentResponse {
+    String documentId;
+    String fileName;
+    String status;
+}
+</pre>
+
+    <p class="mt-3 text-sm">
+      Lombok removes boilerplate and auto-generates builder code.
+    </p>
+  </div>
+
+  <!-- COMPARISON -->
+  <div class="mt-6 grid md:grid-cols-2 gap-4">
+
+    <div class="p-4 rounded-xl bg-sky-50 dark:bg-slate-800 border">
+      <h4 class="font-bold">Manual Builder Interface</h4>
+      <ul class="text-sm mt-2 list-disc ml-5">
+        <li>Full control</li>
+        <li>Custom validation logic</li>
+        <li>Enterprise consistency</li>
+        <li>Better for complex systems</li>
+      </ul>
+    </div>
+
+    <div class="p-4 rounded-xl bg-emerald-50 dark:bg-slate-800 border">
+      <h4 class="font-bold">Lombok Builder</h4>
+      <ul class="text-sm mt-2 list-disc ml-5">
+        <li>Less code</li>
+        <li>Faster development</li>
+        <li>Easy to read</li>
+        <li>Best for simple DTOs</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- BEST PRACTICES -->
+  <div class="mt-6 p-4 rounded-xl bg-yellow-50 dark:bg-slate-800 border border-yellow-200">
+    <h4 class="font-bold">Best Practices</h4>
+    <ul class="list-disc ml-5 mt-2 text-sm">
+      <li>Use <strong>Jakarta Validation</strong> on all incoming requests</li>
+      <li>Keep validation out of controllers</li>
+      <li>Use <strong>Lombok</strong> for simple DTOs</li>
+      <li>Use <strong>Builder Interface</strong> for complex domain objects</li>
+      <li>Keep services responsible for business logic</li>
+    </ul>
+  </div>
+
+</section>
