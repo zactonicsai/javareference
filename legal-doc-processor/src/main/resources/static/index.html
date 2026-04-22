@@ -8,18 +8,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@9.2.4/ol.css">
     <script src="https://cdn.jsdelivr.net/npm/ol@9.2.4/dist/ol.js"></script>
     <style>
-        .map-container { height: 400px; width: 100%; border-radius: 0.5rem; border: 1px solid #e5e7eb; }
+        .map-container { height: 360px; width: 100%; border-radius: 0.5rem; border: 1px solid #e5e7eb; }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .status-ok  { background: #16a34a; box-shadow: 0 0 6px #16a34a; }
         .status-bad { background: #dc2626; box-shadow: 0 0 6px #dc2626; }
         .status-unknown { background: #9ca3af; }
+        /* Keep extracted-text modal scrollable instead of letting it blow past the viewport */
+        .modal-body { max-height: 70vh; overflow-y: auto; }
+        mark { background-color: #fde68a; padding: 0 2px; border-radius: 2px; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
 
 <!-- Service down banner -->
 <div id="serviceBanner" class="hidden bg-red-600 text-white py-3 px-6 shadow-lg">
-    <div class="max-w-5xl mx-auto flex items-center">
+    <div class="max-w-6xl mx-auto flex items-center">
         <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 9v2m0 4h.01M12 3a9 9 0 100 18 9 9 0 000-18z"/>
@@ -31,15 +34,15 @@
     </div>
 </div>
 
-<div class="max-w-5xl mx-auto p-6">
+<div class="max-w-6xl mx-auto p-6">
 
     <header class="mb-6">
         <h1 class="text-3xl font-bold text-slate-800">Legal Document Processor</h1>
-        <p class="text-slate-600">Upload a document, pin its location, and kick off a Temporal workflow.</p>
+        <p class="text-slate-600">Upload a document, pin its location, search the archive.</p>
     </header>
 
     <!-- Service status panel -->
-    <div class="bg-white rounded-lg shadow p-4 mb-6">
+    <section class="bg-white rounded-lg shadow p-4 mb-6">
         <h2 class="text-lg font-semibold text-slate-700 mb-3">Service Health</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
             <div><span id="dot-s3"            class="status-dot status-unknown"></span>S3 (LocalStack)</div>
@@ -51,68 +54,148 @@
             Connection: <span id="wsStatus">connecting...</span> |
             Last update: <span id="lastUpdate">-</span>
         </p>
-    </div>
+    </section>
 
     <!-- Upload form -->
-    <form id="uploadForm" class="bg-white rounded-lg shadow p-6 space-y-5">
+    <section class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold text-slate-700 mb-4">Upload a Document</h2>
+        <form id="uploadForm" class="space-y-5">
+            <div>
+                <label for="subject" class="block text-sm font-medium text-slate-700 mb-1">Subject</label>
+                <input type="text" id="subject" name="subject" required
+                       class="w-full border border-slate-300 rounded px-3 py-2
+                              focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="e.g. Case #2025-001 - Evidence packet">
+            </div>
 
-        <div>
-            <label for="subject" class="block text-sm font-medium text-slate-700 mb-1">Subject</label>
-            <input type="text" id="subject" name="subject" required
-                   class="w-full border border-slate-300 rounded px-3 py-2
-                          focus:outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="e.g. Case #2025-001 - Evidence packet">
-        </div>
+            <div>
+                <label for="file" class="block text-sm font-medium text-slate-700 mb-1">File</label>
+                <input type="file" id="file" name="file" required
+                       class="w-full border border-slate-300 rounded px-3 py-2 bg-white">
+                <p class="text-xs text-slate-500 mt-1">PDF, DOCX, TXT, images. Max 100 MB.</p>
+            </div>
 
-        <div>
-            <label for="file" class="block text-sm font-medium text-slate-700 mb-1">File</label>
-            <input type="file" id="file" name="file" required
-                   class="w-full border border-slate-300 rounded px-3 py-2 bg-white">
-            <p class="text-xs text-slate-500 mt-1">PDF, DOCX, TXT, images. Max 100 MB.</p>
-        </div>
-
-        <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">
-                Location (click on the map to pin)
-            </label>
-            <div id="map" class="map-container"></div>
-            <div class="grid grid-cols-3 gap-3 mt-3 text-sm">
-                <div>
-                    <label class="block text-xs text-slate-500">Latitude</label>
-                    <input type="text" id="latitude" name="latitude" readonly
-                           class="w-full border border-slate-200 bg-slate-50 rounded px-2 py-1">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-500">Longitude</label>
-                    <input type="text" id="longitude" name="longitude" readonly
-                           class="w-full border border-slate-200 bg-slate-50 rounded px-2 py-1">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-500">Description</label>
-                    <input type="text" id="locationDescription" name="locationDescription"
-                           class="w-full border border-slate-300 rounded px-2 py-1"
-                           placeholder="e.g. Downtown Atlanta">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Location (click on the map to pin)
+                </label>
+                <div id="map" class="map-container"></div>
+                <div class="grid grid-cols-3 gap-3 mt-3 text-sm">
+                    <div>
+                        <label class="block text-xs text-slate-500">Latitude</label>
+                        <input type="text" id="latitude" name="latitude" readonly
+                               class="w-full border border-slate-200 bg-slate-50 rounded px-2 py-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500">Longitude</label>
+                        <input type="text" id="longitude" name="longitude" readonly
+                               class="w-full border border-slate-200 bg-slate-50 rounded px-2 py-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500">Description</label>
+                        <input type="text" id="locationDescription" name="locationDescription"
+                               class="w-full border border-slate-300 rounded px-2 py-1"
+                               placeholder="e.g. Downtown Atlanta">
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="flex items-center justify-between">
-            <button type="submit" id="submitBtn"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium
-                           px-6 py-2 rounded disabled:bg-slate-400 disabled:cursor-not-allowed">
-                Upload & Process
+            <div class="flex items-center justify-between">
+                <button type="submit" id="submitBtn"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium
+                               px-6 py-2 rounded disabled:bg-slate-400 disabled:cursor-not-allowed">
+                    Upload & Process
+                </button>
+                <span id="uploadStatus" class="text-sm text-slate-600"></span>
+            </div>
+        </form>
+
+        <div id="resultPanel" class="hidden mt-4">
+            <h3 class="text-sm font-semibold text-slate-700 mb-1">Last Upload Response</h3>
+            <pre id="resultContent"
+                 class="bg-slate-900 text-green-400 text-xs p-3 rounded overflow-auto"></pre>
+        </div>
+    </section>
+
+    <!-- Search panel -->
+    <section class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-lg font-semibold text-slate-700">Search Archive</h2>
+            <button id="refreshBtn"
+                    class="text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded">
+                Refresh list
             </button>
-            <span id="uploadStatus" class="text-sm text-slate-600"></span>
         </div>
-    </form>
 
-    <!-- Results -->
-    <div id="resultPanel" class="hidden bg-white rounded-lg shadow p-6 mt-6">
-        <h3 class="text-lg font-semibold text-slate-700 mb-2">Result</h3>
-        <pre id="resultContent"
-             class="bg-slate-900 text-green-400 text-xs p-4 rounded overflow-auto"></pre>
+        <form id="searchForm" class="flex gap-2 mb-4">
+            <input type="text" id="searchQuery"
+                   class="flex-1 border border-slate-300 rounded px-3 py-2
+                          focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Search extracted text, file name, subject…">
+            <select id="searchMode"
+                    class="border border-slate-300 rounded px-2 py-2 text-sm bg-white">
+                <option value="fulltext">Full text</option>
+                <option value="keyword">Exact keyword</option>
+            </select>
+            <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                Search
+            </button>
+            <button type="button" id="clearSearchBtn"
+                    class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded">
+                Clear
+            </button>
+        </form>
+
+        <p id="docsSummary" class="text-xs text-slate-500 mb-2">Loading documents…</p>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm border-collapse">
+                <thead>
+                    <tr class="bg-slate-100 text-slate-700">
+                        <th class="text-left px-3 py-2 border-b border-slate-200">File name</th>
+                        <th class="text-left px-3 py-2 border-b border-slate-200">Subject</th>
+                        <th class="text-left px-3 py-2 border-b border-slate-200">Type</th>
+                        <th class="text-right px-3 py-2 border-b border-slate-200">Size</th>
+                        <th class="text-right px-3 py-2 border-b border-slate-200">Pages</th>
+                        <th class="text-left px-3 py-2 border-b border-slate-200">Uploaded</th>
+                        <th class="text-left px-3 py-2 border-b border-slate-200">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="docsTableBody">
+                    <!-- rows injected by app.js -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<!-- Modal: extracted text viewer -->
+<div id="textModal"
+     class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full">
+        <div class="flex items-center justify-between px-5 py-3 border-b border-slate-200">
+            <div>
+                <h3 class="text-lg font-semibold text-slate-800" id="modalTitle">Extracted Text</h3>
+                <p class="text-xs text-slate-500" id="modalSubtitle"></p>
+            </div>
+            <button id="closeModalBtn"
+                    class="text-slate-500 hover:text-slate-800 text-2xl leading-none">&times;</button>
+        </div>
+        <div class="modal-body px-5 py-4">
+            <pre id="modalText" class="whitespace-pre-wrap text-sm text-slate-800 font-mono"></pre>
+        </div>
+        <div class="px-5 py-3 border-t border-slate-200 flex justify-end gap-2">
+            <button id="copyTextBtn"
+                    class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded text-sm">
+                Copy
+            </button>
+            <button id="closeModalBtn2"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-sm">
+                Close
+            </button>
+        </div>
     </div>
-
 </div>
 
 <script src="/app.js"></script>

@@ -138,6 +138,33 @@ Six new test files (the five originals are untouched):
   task queues and mocked activities to verify fan-out, ordering, and call
   sequence.
 
+## UI: search, document list, download, view-text
+
+The static page now drives a small archive UI on top of the existing upload
+form. Three new REST endpoints back it:
+
+- `GET /api/search?q=…&size=N` — full-text `multi_match` across
+  `extractedText`, `fileName`, `subject`, `locationDescription`.
+- `GET /api/search/all?size=N` — `match_all` sorted by `uploadDateTime` desc.
+  Powers the default "all documents" table.
+- `GET /api/documents/{id}` / `/download` / `/text` — single-document lookup,
+  streamed S3 download (with `Content-Disposition: attachment`), and
+  extracted text as `text/plain; charset=UTF-8`.
+
+`ElasticsearchService` gained matching methods: `fullTextSearch(q, size)`,
+`listAll(size)`, `getById(id)`.
+
+The page (`index.html` + `app.js`):
+- A search form with a mode dropdown (full text / exact keyword) and a
+  clear button that falls back to listing everything.
+- A documents table with file name, subject, type, size, pages, upload
+  time, and per-row **Download** and **View text** buttons.
+- A modal that fetches `/api/documents/{id}/text` and shows the extracted
+  text with a copy button. All user-supplied values go through an
+  `escapeHtml` helper before reaching `innerHTML` to avoid XSS.
+- After an upload, the table auto-refreshes three times with backoff to
+  catch the index write once the Temporal workflow finishes.
+
 ## Not done / known risks
 
 - **Never compiled.** Maven Central is blocked by the egress proxy in this

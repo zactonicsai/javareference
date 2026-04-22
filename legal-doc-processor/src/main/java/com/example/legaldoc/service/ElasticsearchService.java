@@ -101,6 +101,61 @@ public class ElasticsearchService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Free-text search across the fields most useful for UI-driven lookup:
+     * extracted text, file name, subject, and location description. Uses
+     * {@code multi_match} with the {@code BEST_FIELDS} type so the most
+     * relevant field contributes the score.
+     */
+    public List<DocumentMetadata> fullTextSearch(String query, int size) throws IOException {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+        SearchResponse<DocumentMetadata> response = esClient.search(s -> s
+                        .index(indexName)
+                        .size(size)
+                        .query(q -> q.multiMatch(mm -> mm
+                                .query(query)
+                                .fields("extractedText", "fileName", "subject", "locationDescription")
+                                .type(co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType.BestFields))),
+                DocumentMetadata.class);
+
+        return response.hits().hits().stream()
+                .map(co.elastic.clients.elasticsearch.core.search.Hit::source)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Return every indexed document, newest upload first, up to {@code size}.
+     * Used by the UI to render the "all documents" table. For a real
+     * deployment this should be paginated with search_after; fine for dev.
+     */
+    public List<DocumentMetadata> listAll(int size) throws IOException {
+        SearchResponse<DocumentMetadata> response = esClient.search(s -> s
+                        .index(indexName)
+                        .size(size)
+                        .query(q -> q.matchAll(m -> m))
+                        .sort(so -> so.field(f -> f
+                                .field("uploadDateTime")
+                                .order(co.elastic.clients.elasticsearch._types.SortOrder.Desc))),
+                DocumentMetadata.class);
+
+        return response.hits().hits().stream()
+                .map(co.elastic.clients.elasticsearch.core.search.Hit::source)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Fetch a single document by its document ID (which is also the ES doc id).
+     * Returns {@code null} if the document does not exist.
+     */
+    public DocumentMetadata getById(String documentId) throws IOException {
+        var resp = esClient.get(g -> g.index(indexName).id(documentId), DocumentMetadata.class);
+        return resp.found() ? resp.source() : null;
+    }
+
     public boolean isAvailable() {
         try {
             HealthResponse health = esClient.cluster().health();
