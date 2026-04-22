@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="max-w-xl w-full bg-white shadow-xl rounded-2xl p-8 text-center">
+
+    <!-- Icon -->
+    <div class="text-red-500 text-6xl mb-4">⚠️</div>
+
+    <!-- Title -->
+    <h1 id="errorTitle" class="text-2xl font-bold text-gray-800 mb-2">
+        Something went wrong
+    </h1>
+
+    <!-- Message -->
+    <p id="errorMessage" class="text-gray-600 mb-6">
+        An unexpected error occurred.
+    </p>
+
+    <!-- Status -->
+    <div id="errorStatus" class="text-sm text-gray-400 mb-4"></div>
+
+    <!-- Buttons -->
+    <div class="flex justify-center gap-4 mb-6">
+        <button onclick="goHome()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+            Go Home
+        </button>
+
+        <button onclick="toggleDetails()"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
+            Show Details
+        </button>
+    </div>
+
+    <!-- Details -->
+    <div id="detailsBox"
+         class="hidden text-left bg-gray-50 border rounded-lg p-4 text-sm text-gray-700">
+        <pre id="errorDetails"></pre>
+    </div>
+
+</div>
+
+<script>
+    // Try to read error JSON from query or fallback
+    function getErrorFromQuery() {
+        const params = new URLSearchParams(window.location.search);
+
+        return {
+            status: params.get("status"),
+            error: params.get("error"),
+            message: params.get("message"),
+            path: params.get("path")
+        };
+    }
+
+    function renderError(err) {
+        if (!err) return;
+
+        document.getElementById("errorTitle").innerText =
+            err.error || "Error";
+
+        document.getElementById("errorMessage").innerText =
+            err.message || "Unexpected issue";
+
+        document.getElementById("errorStatus").innerText =
+            err.status ? `Status: ${err.status}` : "";
+
+        document.getElementById("errorDetails").innerText =
+            JSON.stringify(err, null, 2);
+    }
+
+    function toggleDetails() {
+        const box = document.getElementById("detailsBox");
+        box.classList.toggle("hidden");
+    }
+
+    function goHome() {
+        window.location.href = "/";
+    }
+
+    // INIT
+    const error = getErrorFromQuery();
+    renderError(error);
+</script>
+
+</body>
+</html>

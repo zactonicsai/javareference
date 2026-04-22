@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: legal-doc-processor
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  thymeleaf:
+    cache: false
+
+server:
+  port: 8080
+
+aws:
+  endpoint: ${AWS_ENDPOINT:http://localhost:4566}
+  region: ${AWS_REGION:us-east-1}
+  accessKey: ${AWS_ACCESS_KEY_ID:test}
+  secretKey: ${AWS_SECRET_ACCESS_KEY:test}
+  s3:
+    bucket: ${S3_BUCKET:legal-documents}
+  sqs:
+    queueName: ${SQS_QUEUE:legal-doc-processing-queue}
+
+temporal:
+  host: ${TEMPORAL_HOST:localhost:7233}
+  namespace: default
+  taskQueue: legal-doc-task-queue
+
+elasticsearch:
+  host: ${ELASTICSEARCH_HOST:localhost}
+  port: ${ELASTICSEARCH_PORT:9200}
+  indexName: legal-documents
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.example.legaldoc: DEBUG
+    io.temporal: INFO
+    software.amazon.awssdk: WARN
